@@ -1,0 +1,4 @@
+sqlalchemy
+sqladmin
+fastapi
+uvicorn
