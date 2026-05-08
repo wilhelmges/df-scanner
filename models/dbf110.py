@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, String, Numeric
 from db import Base
 
-class PaymentRecord(Base):
-    __tablename__ = "payment_records"
+class Df1(Base):
+    __tablename__ = "df1s"
     __table_args__ = {
         "comment": "Імпорт з dBase III Plus: реєстр нарахувань/виплат"
     }
@@ -121,4 +121,8 @@ class PaymentRecord(Base):
 
     OTD = Column(String(1), comment="Відділ/код", info={
         "dbf_type": "C", "length": 1, "label": "Відділ"
+    })
+
+    _ERROR = Column(String(2000), comment="Помилка у вхідних данних", info={
+        "dbf_type": "C"
     })
