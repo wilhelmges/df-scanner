@@ -87,6 +87,32 @@ def load_dbf_rows(table):
         for row in rows
     ]
 
+def get_different_fields(rows: list[dict]) -> dict:
+    """
+    Повертає словник:
+    {
+        "FIELD": [значення_по_рядках]
+    }
+
+    лише для тих полів, де є різні значення.
+    """
+
+    values_by_field = defaultdict(list)
+
+    # збираємо значення полів
+    for row in rows:
+        for key, value in row.items():
+            values_by_field[key].append(value)
+
+    # залишаємо тільки поля з різними значеннями
+    result = {
+        key: values
+        for key, values in values_by_field.items()
+        if len(set(values)) > 1
+    }
+
+    return result
+
 def is_adjustment_for1person(rows):
     _={row['NUMIDENT'] for row in rows}
     if len(_)==1:
@@ -101,11 +127,14 @@ def apply_adjustment(file: Path):
             continue
         #print(f"notfull 0,1 in {str(file)}")
         return
-    print(f" letstry {str(file)}")
+    # print(f" letstry {str(file)}")
     session = SessionLocal()
     adj = load_dbf_rows(table)
-    if is_adjustment_for1person(adj):
-        print(adj); exit()
+    print(get_different_fields(adj))
+
+    #
+    # if is_adjustment_for1person(adj):
+    #     print(adj); exit()
 
 
 
