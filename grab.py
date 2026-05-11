@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from models.dbf110 import Df1
 from db import Base, engine, SessionLocal
 from core import check_tax_code
+from core import dbf_report_params
 from pathlib import Path
 from collections import defaultdict
 
@@ -29,14 +30,14 @@ def grab_df1(file: Path):
 
 
         session.add(Df1(
-            NUMIDENT=record.NUMIDENT,
+            NUMIDENT=str(record.NUMIDENT).strip(),
             PERIOD_M=record.PERIOD_M,
             PERIOD_Y=record.PERIOD_Y,
             PAY_TP=record.PAY_TP,
             PAY_MNTH=record.PAY_MNTH,
             PAY_YEAR=record.PAY_YEAR,
-            LN=record.LN.capitalize(),
-            NM=record.NM.capitalize(),
+            LN=record.LN.capitalize().strip(),
+            NM=record.NM.capitalize().strip(),
             SUM_NARAH=sumnarah,
             OZN=record.OZN,
         ))
@@ -118,19 +119,62 @@ def is_adjustment_for1person(rows):
     if len(_)==1:
         return True
 
+def to_int(value, default=-1):
+    if value is None:
+        return default
+
+    s = str(value).strip()
+
+    if not s:
+        return default
+
+    return int(float(s))
+
+def lookfor23(file: Path):
+    table = dbf.Table(str(file), codepage='cp1251')
+    print(str(file), dbf_report_params(str(file.stem)))
+    table.open()
+    dfnum = dbf_report_params(str(file.stem))
+    for record in table:
+        s = None
+        num = -1
+        sp = None
+        pay_tp = -1
+
+        if dfnum == 1 or dfnum == 5:
+            s = record.OZN
+            num = to_int(s)
+
+        if dfnum == 4:
+            s = record.OZNAKA
+            num = to_int(s)
+
+        if dfnum==1:
+            sp = record.PAY_TP
+            pay_tp = to_int(sp)
+            print(s, num, sp, pay_tp)
+        else:
+            print(s, num)
+        if num==2 or num==3:
+            print(str(file))
+
+
 def apply_adjustment(file: Path):
     table = dbf.Table(str(file), codepage='cp1251')
     table.open()
 
     for record in table:
-        if record.OZN.isdigit() and (int(record.OZN)==1 or int(record.OZN)==0):
-            continue
+        #print('ozn '+record.OZN)
+        if dbf_report_params(str(file))==1 or dbf_report_params(str(file))==5 and( (int(record.OZN)==2 or int(record.OZN)==3)):
+            print(str(file))
+        if dbf_report_params(str(file))==4 and ((int(record.OZNAKA)==2 or int(record.OZNAKA)==3)):
+            print(str(file))
         #print(f"notfull 0,1 in {str(file)}")
-        return
+    return
     # print(f" letstry {str(file)}")
-    session = SessionLocal()
-    adj = load_dbf_rows(table)
-    print(get_different_fields(adj))
+    # session = SessionLocal()
+    # adj = load_dbf_rows(table)
+    # print(get_different_fields(adj))
 
     #
     # if is_adjustment_for1person(adj):

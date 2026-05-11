@@ -1,6 +1,6 @@
 from pathlib import Path
 from core import dbf_report_params
-from grab import grab_df1, check_df1, apply_adjustment
+from grab import grab_df1, check_df1, apply_adjustment, lookfor23
 
 def read_adjustment(filepath):
     table = dbf.Table(str(filepath), codepage='cp1251')
@@ -43,13 +43,10 @@ def iterate_quarter_folder(str_file_path):
     return operations, adjustments, toresearch
 
 if __name__=="__main__":
-    string_file_path = r"s:\МЕДОК"  #r"C:\progs\df-scanner\samples\short_quarters" #
+    string_file_path = r"s:\МЕДОК"  #r"C:\progs\df-scanner\samples\medoc" #
     #read_adjustment(r"")
     rez = iterate_quarter_folder(string_file_path)
     print(len(rez[0]), len(rez[1]))
-    for file in rez[1]:
-        #print(file.stem, dbf_report_params(file.stem))
+    for file in rez[0]:
         if dbf_report_params(file.stem)==1:
-            apply_adjustment(file)
-            # print(str(file))
-            #grab_df1(file)
+            grab_df1(file)

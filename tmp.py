@@ -1,24 +1,9 @@
-from utils import dbf_report_params
+from types import SimpleNamespace
 
-print(dbf_report_params())
+obj = SimpleNamespace(**{
+    "field1": 123,
+    "field2": "hello"
+})
 
-
-
-# J0510506
-# J0510506_23_3_уточн
-# J510510_11_2024
-# J510510_12_2024
-# J0510106_23_3_9_4802
-# J0510109_11
-# J0510109_12
-# J0510109_11
-# J0510506
-# J510510_12_2024
-# J0510106_Гаврилюк_2
-# J0510506
-# J0510109_11
-# J0510506_24_4_Гончарук
-# J0510110_10
-# j0510410_10_2025
-# J0510110_11
-# J0510109_11
+print(obj.field1)  # 123
+print(obj)  # hello
