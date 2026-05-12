@@ -45,17 +45,17 @@ if __name__=="__main__":
         if dbf_report_params(file.stem)==1:
             folder = str(file.parent)
             print(folder)
-            store = FileMetadataStore(folder)
-            if store.is_initialized():
-                print("Metadata вже існує")
-            else:
-                print("Папка ще не ініціалізована")
+            # store = FileMetadataStore(folder)
+            # if store.is_initialized():
+            #     print("Metadata вже існує")
+            # else:
+            #     print("Папка ще не ініціалізована")
 
             print(file.name)
             if not apply_df1_adjustment(file):
                 print('failed')
-                store.set_status(file.name,"failed"); store.update_file_info(file.name)
+                # store.set_status(file.name,"failed"); store.update_file_info(file.name)
             else:
                 print('42')
-                store.set_status(file.name, "42"); store.update_file_info(file.name)
+                # store.set_status(file.name, "42"); store.update_file_info(file.name)
 

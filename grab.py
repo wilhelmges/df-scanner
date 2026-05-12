@@ -159,15 +159,17 @@ def lookfor23(file: Path):
 
 
 def apply_df1_adjustment(file: Path):
-    if dbf_report_params(str(file.stem))!=1:
-        return
+    # if dbf_report_params(str(file.stem))!=1:
+    #     return
     table = dbf.Table(str(file), codepage='cp1251')
     table.open()
 
     for record in table:
+
         rerec = normalize_dbf_record(record, as_object=True)
         ozn = rerec.OZN
-        if ozn==1:
+        print("new record", ozn)
+        if ozn == 1:
             print("deleting")
             todelete = finddf1(rerec)
             print(todelete.NUMIDENT, todelete.LN)
