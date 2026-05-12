@@ -7,6 +7,10 @@ from core import check_tax_code
 from core import dbf_report_params
 from pathlib import Path
 from collections import defaultdict
+from repository import finddf1
+from types import SimpleNamespace
+
+from sanitizer import normalize_dbf_record
 
 
 # C:\progs\df-scanner\samples\J0510409_4_2024.dbf  r"C:\progs\df-scanner\1 кв. 2023\Уточнення Гладишенко\J0510106_1_23_1.dbf"
@@ -17,11 +21,6 @@ def grab_df1(file: Path):
 
     for record in table:
         ipn=record.NUMIDENT
-        # print(ipn)
-        # if not ipn.isdigit():
-        #     continue
-        # if not check_tax_code(ipn):
-        #     print(ipn, record.LN, record.NM)
         try:
             sumnarah=float(record.SUM_NARAH)
         except Exception as e:
@@ -159,18 +158,25 @@ def lookfor23(file: Path):
             print(str(file))
 
 
-def apply_adjustment(file: Path):
+def apply_df1_adjustment(file: Path):
+    if dbf_report_params(str(file.stem))!=1:
+        return
     table = dbf.Table(str(file), codepage='cp1251')
     table.open()
 
     for record in table:
-        #print('ozn '+record.OZN)
-        if dbf_report_params(str(file))==1 or dbf_report_params(str(file))==5 and( (int(record.OZN)==2 or int(record.OZN)==3)):
-            print(str(file))
-        if dbf_report_params(str(file))==4 and ((int(record.OZNAKA)==2 or int(record.OZNAKA)==3)):
-            print(str(file))
-        #print(f"notfull 0,1 in {str(file)}")
-    return
+        rerec = normalize_dbf_record(record, as_object=True)
+        ozn = rerec.OZN
+        if ozn==1:
+            print("deleting")
+            todelete = finddf1(rerec)
+            print(todelete.NUMIDENT, todelete.LN)
+
+        elif ozn==0:
+            print("inserting")
+        else:
+            pass
+    return 42
     # print(f" letstry {str(file)}")
     # session = SessionLocal()
     # adj = load_dbf_rows(table)
