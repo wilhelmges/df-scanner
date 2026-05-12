@@ -43,8 +43,7 @@ def iterate_quarter_folder(str_file_path):
     return operations, adjustments, toresearch
 
 if __name__=="__main__":
-    string_file_path = r"s:\МЕДОК"  #r"C:\progs\df-scanner\samples\medoc" #
-    #read_adjustment(r"")
+    string_file_path = r"C:\progs\df-scanner\samples\medoc" #r"s:\МЕДОК"  #
     rez = iterate_quarter_folder(string_file_path)
     print(len(rez[0]), len(rez[1]))
     for file in rez[0]:
