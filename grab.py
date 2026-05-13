@@ -7,7 +7,7 @@ from core import check_tax_code, to_int
 from core import dbf_report_params
 from pathlib import Path
 from collections import defaultdict
-from repository import finddf1, find_df1_anddeleteifonlyone, add_df1
+from repository import finddf1, find_df1_anddeleteifonlyone, add_df1, incdec_df1_record
 from types import SimpleNamespace
 
 from sanitizer import normalize_dbf_record
@@ -149,14 +149,12 @@ def apply_df1_adjustment(file: Path):
                 if ozn == 1:
                     find_df1_anddeleteifonlyone(rerec, session)
                     print("deleted")
-                elif pay_tp==3:
-                    print("decrement")
-                elif pay_tp==2:
-                    print("increment")
+                elif pay_tp==2 or pay_tp==3:
+                    print("incdec")
+                    incdec_df1_record(rerec, session)
                 else:
                     add_df1(rerec, session)
                     print("inserted")
-
         session.commit()
     except Exception as e:
         print(str(e))
@@ -164,8 +162,6 @@ def apply_df1_adjustment(file: Path):
         return None
 
     return 42
-
-
 
     # print(f" letstry {str(file)}")
     # session = SessionLocal()
