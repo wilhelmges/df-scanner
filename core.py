@@ -7,6 +7,17 @@ def dbf_report_params(filename):
     # for part in sway[1:]:
     #     if part.isdigit() and int(part) < 13:
 
+def to_int(value, default=-1):
+    if value is None:
+        return default
+
+    s = str(value).strip()
+
+    if not s:
+        return default
+
+    return int(float(s))
+
 def check_tax_code(code: str) -> bool:
     if len(code) != 10 or not code.isdigit():
         return False

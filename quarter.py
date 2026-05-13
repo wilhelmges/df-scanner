@@ -2,7 +2,7 @@ from pathlib import Path
 from core import dbf_report_params
 from grab import grab_df1, check_df1, apply_df1_adjustment, lookfor23
 from file_metadata import FileMetadataStore
-
+from repository import delete_from_df1
 
 def iterate_quarter_folder(str_file_path):
     operations = []
@@ -41,10 +41,12 @@ if __name__=="__main__":
     string_file_path = r"C:\progs\df-scanner\samples\medok" #r"s:\МЕДОК"  #
     rez = iterate_quarter_folder(string_file_path)
     print(len(rez[0]), len(rez[1]))
-    for file in rez[1][:7]:
+
+    #delete_from_df1()
+    for file in rez[1]:
         if dbf_report_params(file.stem)==1:
             folder = str(file.parent)
-            print(folder)
+            apply_df1_adjustment(file); continue
             # store = FileMetadataStore(folder)
             # if store.is_initialized():
             #     print("Metadata вже існує")
@@ -52,7 +54,9 @@ if __name__=="__main__":
             #     print("Папка ще не ініціалізована")
 
             print(file.name)
-            if not apply_df1_adjustment(file):
+            rez = apply_df1_adjustment(file)
+            print('file proced with rez ', rez)
+            if not rez:
                 print('failed')
                 # store.set_status(file.name,"failed"); store.update_file_info(file.name)
             else:
