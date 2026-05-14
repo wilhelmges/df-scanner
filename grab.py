@@ -10,7 +10,8 @@ from core import check_tax_code, to_int, short_dbf_path
 from core import dbf_report_params
 from pathlib import Path
 from collections import defaultdict
-from repository import finddf1, find_df1_anddeleteifonlyone, add_df1, incdec_df1_record
+from repository import finddf1, find_df1_anddeleteifonlyone, add_df1
+from repository import inc_or_create, dec_or_delete
 from types import SimpleNamespace
 
 
@@ -73,7 +74,7 @@ def apply_df1_adjustment(file: Path):
                 if pay_tp == 2:
                     inc_or_create(rerec, session)
                 elif pay_tp == 3:
-                    incdec_df1_record(rerec, session)
+                    dec_or_delete(rerec, session)
                 elif ozn == 1:
                     find_df1_anddeleteifonlyone(rerec, session)
                 elif ozn == 0:
@@ -87,8 +88,8 @@ def apply_df1_adjustment(file: Path):
         return None
     except Exception as e:
         print(rerec.NUMIDENT, rerec.LN, str(file), str(e))
-        session.rollback()
-        return None
+        # session.rollback()
+        # return None
 
     return 42
 

@@ -46,7 +46,7 @@ def find_df1_anddeleteifonlyone(shape: SimpleNamespace, session):
         Df1.PAY_MNTH == shape.PAY_MNTH,
         Df1.PAY_TP == shape.PAY_TP,
     )
-    result = session.execute(stmt).scalar_one_or_none()
+    result = session.execute(stmt).scalar_one()
     if result is None:
         raise Exception("Не знайдено")
     else:
@@ -84,7 +84,7 @@ def inc_or_create(rerec: SimpleNamespace, session):
     if obj is None: # we need to add record
         add_df1(rerec, session)
         return
-    obj.SUM_NARAH = Decimal(str(obj.SUM_NARAH)) + Decimal(str(rerec.SUM_INS))
+    obj.SUM_NARAH += Decimal(str(rerec.SUM_NARAH))
 
 def dec_or_delete(rerec: SimpleNamespace, session):
     stmt = select(Df1).where(
@@ -95,8 +95,13 @@ def dec_or_delete(rerec: SimpleNamespace, session):
         Df1.PAY_MNTH == rerec.PAY_MNTH,
     )
     obj = session.execute(stmt).scalar_one()
-    if Decimal
-
+    diffnarah = obj.SUM_NARAH - Decimal(str(rerec.SUM_NARAH))
+    if diffnarah == 0:
+        session.delete(obj)
+        return
+    if float(abs(diffnarah)) < 0.01:
+        raise Exception('maybe delete? ')
+    obj.SUM_NARAH-=Decimal(str(rerec.SUM_NARAH))
 
 
 def incdec_df1_record(shape: SimpleNamespace, session):

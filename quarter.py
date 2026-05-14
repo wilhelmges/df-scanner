@@ -53,7 +53,7 @@ if __name__=="__main__":
     for file in rez[1]:
         if dbf_report_params(file.stem)==1:
             folder = str(file.parent)
-            #apply_df1_adjustment(file); continue
+            apply_df1_adjustment(file); continue
             lookfor23(file); continue
 
             # store = FileMetadataStore(folder)

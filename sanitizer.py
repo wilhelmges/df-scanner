@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from types import SimpleNamespace
 from typing import Any
 import re
@@ -21,12 +21,17 @@ INT_FIELDS = {
     "OZN",
 }
 
+# поля що мають бути float
 FLOAT_FIELDS = {
     "SUM_TOTAL",
     "SUM_MAX",
-    "SUM_NARAH",
     "SUM_DIFF",
     "SUM_INS",
+}
+
+# поля що мають бути Decimal
+DECIMAL_FIELDS = {
+    "SUM_NARAH",
 }
 
 STRING_FIELDS = {
@@ -43,22 +48,12 @@ STRING_FIELDS = {
     "EXP",
     "NRC",
     "NRM",
-
 }
 
 
 # --- допоміжні функції -------------------------------------------------------
 
 def _clean_string(value: Any) -> str | None:
-    """
-    Безпечна очистка строк:
-    - None -> None
-    - trim
-    - lower()
-    - видалення control chars
-    - кілька пробілів -> один
-    - порожня строка -> None
-    """
 
     if value is None:
         return None
@@ -96,29 +91,32 @@ def _safe_decimal(value: Any) -> Decimal | None:
         if isinstance(value, Decimal):
             return value
 
+        if isinstance(value, int):
+            return Decimal(value)
+
+        if isinstance(value, float):
+            # через str щоб уникнути похибок float
+            return Decimal(str(value))
+
         s = str(value).strip()
 
         if not s:
             return None
 
-            # прибрати всі пробіли включно з NBSP
-            s = s.replace("\xa0", "")
-            s = s.replace(" ", "")
+        # прибрати всі пробіли включно з NBSP
+        s = s.replace("\xa0", "")
+        s = s.replace(" ", "")
 
-            # legacy формат
-            s = s.replace(",", ".")
+        # legacy формат
+        s = s.replace(",", ".")
 
         return Decimal(s)
 
     except Exception:
         return None
+
+
 def _safe_int(value: Any) -> int | None:
-    """
-    Безпечне перетворення:
-    2025.00 -> 2025
-    '02' -> 2
-    '' -> None
-    """
 
     dec = _safe_decimal(value)
 
@@ -133,29 +131,13 @@ def _safe_int(value: Any) -> int | None:
 
 def _safe_float(value: Any) -> float | None:
 
-    if value is None:
+    dec = _safe_decimal(value)
+
+    if dec is None:
         return None
 
     try:
-
-        # Decimal/int/float
-        if isinstance(value, (Decimal, int, float)):
-            return float(value)
-
-        s = str(value).strip()
-
-        if not s:
-            return None
-
-        # прибрати всі пробіли включно з NBSP
-        s = s.replace("\xa0", "")
-        s = s.replace(" ", "")
-
-        # legacy формат
-        s = s.replace(",", ".")
-
-        return float(s)
-
+        return float(dec)
     except Exception:
         return None
 
@@ -167,29 +149,9 @@ def normalize_dbf_record(
     as_object: bool = False,
     keep_unknown_fields: bool = True,
 ):
-    """
-    Нормалізація DBF record.
-
-    Parameters
-    ----------
-    record:
-        рядок з dbf.Table
-
-    as_object:
-        False -> dict
-        True  -> SimpleNamespace з доступом через крапку
-
-    keep_unknown_fields:
-        якщо True — невідомі поля також будуть включені
-
-    Returns
-    -------
-    dict | SimpleNamespace
-    """
 
     result = {}
 
-    # правильне отримання назв полів для dbf.Record
     try:
         field_names = list(record._meta.fields)
     except Exception as e:
@@ -212,29 +174,39 @@ def normalize_dbf_record(
             if value is None:
                 value = 0
 
-        # OZN: пусте значення або пробіли -> -1
+        # OZN: пусте значення -> -1
         elif field_upper == "OZN":
+
             value = _safe_int(raw_value)
+
             if value is None:
                 value = -1
 
         # integer поля
         elif field_upper in INT_FIELDS:
+
             value = _safe_int(raw_value)
+
+        # Decimal поля
+        elif field_upper in DECIMAL_FIELDS:
+
+            value = _safe_decimal(raw_value)
 
         # float поля
         elif field_upper in FLOAT_FIELDS:
+
             value = _safe_float(raw_value)
 
         # string поля
         elif field_upper in STRING_FIELDS:
+
             value = _clean_string(raw_value)
 
         # fallback
         else:
+
             if keep_unknown_fields:
 
-                # якщо число — пробуємо витягнути Decimal
                 if isinstance(raw_value, (int, float, Decimal)):
                     value = _safe_decimal(raw_value)
                 else:
@@ -243,7 +215,6 @@ def normalize_dbf_record(
             else:
                 continue
 
-        # ЗБЕРІГАЄМО ОРИГІНАЛЬНІ НАЗВИ ПОЛІВ
         result[field] = value
 
     if as_object:
