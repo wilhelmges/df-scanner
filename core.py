@@ -1,3 +1,8 @@
+from pathlib import Path
+def short_dbf_path(path: str) -> str:
+    p = Path(path)
+    return "\\" + str(Path(*p.parts[-3:]))
+
 def dbf_report_params(filename):
     sway = filename.split("_")[0][-3]
     if sway.isdigit():

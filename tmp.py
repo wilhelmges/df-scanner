@@ -1,10 +1,14 @@
-from file_metadata import FileMetadataStore
+from decimal import Decimal
 
-store = FileMetadataStore("samples/medok")
-if store.is_initialized():
-    print("Metadata вже існує")
-else:
-    print("Папка ще не ініціалізована")
+print(Decimal("1")*Decimal("2.001"))
+
+# from file_metadata import FileMetadataStore
+#
+# store = FileMetadataStore("samples/medok")
+# if store.is_initialized():
+#     print("Metadata вже існує")
+# else:
+#     print("Папка ще не ініціалізована")
 
 # store.update_file_info("J0510506_23_1.dbf")
 #

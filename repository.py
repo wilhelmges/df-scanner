@@ -43,28 +43,71 @@ def find_df1_anddeleteifonlyone(shape: SimpleNamespace, session):
         Df1.PERIOD_M == shape.PERIOD_M,
         Df1.PERIOD_Y == shape.PERIOD_Y,
         Df1.PAY_YEAR == shape.PAY_YEAR,
-        Df1.PAY_MNTH == shape.PAY_MNTH
+        Df1.PAY_MNTH == shape.PAY_MNTH,
+        Df1.PAY_TP == shape.PAY_TP,
     )
-
     result = session.execute(stmt).scalar_one_or_none()
     if result is None:
         raise Exception("Не знайдено")
     else:
-        print("Знайдено:", result)
         session.delete(result)
 
-def add_df1(shape: SimpleNamespace, session):
+def add_df1(rerec: SimpleNamespace, session):
     session.add(Df1(
-        NUMIDENT=shape.NUMIDENT,
-        PERIOD_M=shape.PERIOD_M,
-        PERIOD_Y=shape.PERIOD_Y,
-        PAY_YEAR=shape.PAY_YEAR,
-        PAY_MNTH=shape.PAY_MNTH
+        PERIOD_M=rerec.PERIOD_M,
+        PERIOD_Y=rerec.PERIOD_Y,
+        NUMIDENT=str(rerec.NUMIDENT),
+        LN=rerec.LN,
+        NM=rerec.NM,
+        FTN=rerec.FTN,
+
+        PAY_TP=rerec.PAY_TP,
+        PAY_MNTH=rerec.PAY_MNTH,
+        PAY_YEAR=rerec.PAY_YEAR,
+
+        SUM_TOTAL=rerec.SUM_TOTAL,
+        SUM_MAX=rerec.SUM_MAX,
+        SUM_INS=rerec.SUM_INS,
+        SUM_NARAH=rerec.SUM_NARAH,
+        OZN=rerec.OZN
     ))
+
+def inc_or_create(rerec: SimpleNamespace, session):
+    stmt = select(Df1).where(
+        Df1.NUMIDENT == rerec.NUMIDENT,
+        Df1.PERIOD_M == rerec.PERIOD_M,
+        Df1.PERIOD_Y == rerec.PERIOD_Y,
+        Df1.PAY_YEAR == rerec.PAY_YEAR,
+        Df1.PAY_MNTH == rerec.PAY_MNTH,
+    )
+    obj = session.execute(stmt).scalar_one_or_none()
+    if obj is None: # we need to add record
+        add_df1(rerec, session)
+        return
+    obj.SUM_NARAH = Decimal(str(obj.SUM_NARAH)) + Decimal(str(rerec.SUM_INS))
+
+def dec_or_delete(rerec: SimpleNamespace, session):
+    stmt = select(Df1).where(
+        Df1.NUMIDENT == rerec.NUMIDENT,
+        Df1.PERIOD_M == rerec.PERIOD_M,
+        Df1.PERIOD_Y == rerec.PERIOD_Y,
+        Df1.PAY_YEAR == rerec.PAY_YEAR,
+        Df1.PAY_MNTH == rerec.PAY_MNTH,
+    )
+    obj = session.execute(stmt).scalar_one()
+    if Decimal
+
+
 
 def incdec_df1_record(shape: SimpleNamespace, session):
     obj = session.execute(
-        select(Df1).where(Df1.id == 1)
+        select(Df1).where(
+            Df1.NUMIDENT == shape.NUMIDENT,
+            Df1.PERIOD_M == shape.PERIOD_M,
+            Df1.PERIOD_Y == shape.PERIOD_Y,
+            Df1.PAY_YEAR == shape.PAY_YEAR,
+            Df1.PAY_MNTH == shape.PAY_MNTH,
+        )
     ).scalar_one()
     sign = -1 if to_int(shape.PAY_TP) == 3 else 1 if to_int(shape.PAY_TP) == 2 else None
     obj.SUM_NARAH += Decimal(sign*shape.SUM_NARAH)

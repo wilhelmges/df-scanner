@@ -1,14 +1,18 @@
+from decimal import Decimal
+
 import dbf
 from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.exc import MultipleResultsFound
 from sqlalchemy.orm import sessionmaker
 from models.dbf110 import Df1
 from db import Base, engine, SessionLocal
-from core import check_tax_code, to_int
+from core import check_tax_code, to_int, short_dbf_path
 from core import dbf_report_params
 from pathlib import Path
 from collections import defaultdict
 from repository import finddf1, find_df1_anddeleteifonlyone, add_df1, incdec_df1_record
 from types import SimpleNamespace
+
 
 from sanitizer import normalize_dbf_record
 
@@ -18,120 +22,41 @@ def grab_df1(file: Path):
     table = dbf.Table(str(file), codepage='cp1251')
     table.open()
     session = SessionLocal()
+    try:
+        for record in table:
+            rerec = normalize_dbf_record(record, as_object=True)
+            #print(rerec.LN, rerec.PAY_TP, rerec.OZN, rerec.SUM_NARAH)
+            add_df1(rerec, session)
+        session.commit()
 
-    for record in table:
-        ipn=record.NUMIDENT
-        try:
-            sumnarah=float(record.SUM_NARAH)
-        except Exception as e:
-            _error = str(e)
-            sumnarah = float(record.SUM_NARAH.replace('\xa0', '').replace(' ', '').replace(',', '.'))
+    except Exception as e:
+        print(str(e), e)
+        exit()
 
-
-        session.add(Df1(
-            NUMIDENT=str(record.NUMIDENT).strip(),
-            PERIOD_M=record.PERIOD_M,
-            PERIOD_Y=record.PERIOD_Y,
-            PAY_TP=record.PAY_TP,
-            PAY_MNTH=record.PAY_MNTH,
-            PAY_YEAR=record.PAY_YEAR,
-            LN=record.LN.capitalize().strip(),
-            NM=record.NM.capitalize().strip(),
-            SUM_NARAH=sumnarah,
-            OZN=record.OZN,
-        ))
-
-    session.commit()
-
-def check_df1(file: Path):
-    table = dbf.Table(str(file), codepage='cp1251')
-    table.open()
-
-    for num, record in enumerate(table, start=1):
-        m = int(record.PERIOD_M)
-        if m<1 or m>12:
-            print(f"Помилка в рядку {num}: file = {str(file)}")
-
-def load_dbf_rows(table):
-    def normalize(value):
-        if isinstance(value, str):
-            value = value.strip()
-
-        return value
-
-    field_names = table.field_names
-
-    rows = []
-
-    for record in table:
-        row = {
-            field: normalize(record[field])
-            for field in field_names
-        }
-
-        rows.append(row)
-
-    used_fields = {
-        field
-        for row in rows
-        for field, value in row.items()
-        if value not in (None, '')
-    }
-
-    return [
-        {
-            field: value
-            for field, value in row.items()
-            if field in used_fields
-        }
-        for row in rows
-    ]
-
-def get_different_fields(rows: list[dict]) -> dict:
-    """
-    Повертає словник:
-    {
-        "FIELD": [значення_по_рядках]
-    }
-
-    лише для тих полів, де є різні значення.
-    """
-
-    values_by_field = defaultdict(list)
-
-    # збираємо значення полів
-    for row in rows:
-        for key, value in row.items():
-            values_by_field[key].append(value)
-
-    # залишаємо тільки поля з різними значеннями
-    result = {
-        key: values
-        for key, values in values_by_field.items()
-        if len(set(values)) > 1
-    }
-
-    return result
-
-def is_adjustment_for1person(rows):
-    _={row['NUMIDENT'] for row in rows}
-    if len(_)==1:
-        return True
 
 def lookfor23(file: Path):
     dfnum = dbf_report_params(str(file.stem))
-    if dfnum!=1:
+    if dfnum != 1:
         return
     table = dbf.Table(str(file), codepage='cp1251')
-    #print(str(file), dbf_report_params(str(file.stem)))
+    # print(str(file), dbf_report_params(str(file.stem)))
     table.open()
-
+    sum01 = Decimal("0")
     for record in table:
         rerec = normalize_dbf_record(record, as_object=True)
         pay_tp = to_int(rerec.PAY_TP)
-        if pay_tp==2 or pay_tp==3:
-            print(rerec.SUM_NARAH, str(file))
-
+        ozn = to_int(rerec.OZN)
+        if (pay_tp == 2 or pay_tp == 3) and (ozn==0 or ozn == 1):
+            print('two operations ',rerec.NUMIDENT,rerec.LN, pay_tp, ozn, short_dbf_path(str(file)))
+        elif not(pay_tp == 2 or pay_tp == 3) and (not(ozn == 0 or ozn == 1)):
+            print('none operation ', rerec.NUMIDENT, rerec.LN, pay_tp, ozn, short_dbf_path(str(file)))
+        elif rerec.SUM_NARAH is None:
+            print('None sum_narah ',repr(rerec.SUM_NARAH), rerec.NUMIDENT, rerec.LN, short_dbf_path(str(file)))
+        elif ozn==0 or ozn == 1:
+            sign = -1 if ozn == 1 else 1 if ozn == 0 else None
+            sum01+=Decimal(str(sign)) * Decimal(str(rerec.SUM_NARAH))
+    if sum01 != 0:
+        print('not zero sum ',sum01, short_dbf_path(str(file)))
 
 def apply_df1_adjustment(file: Path):
     # if dbf_report_params(str(file.stem))!=1:
@@ -145,19 +70,23 @@ def apply_df1_adjustment(file: Path):
                 rerec = normalize_dbf_record(record, as_object=True)
                 ozn = to_int(rerec.OZN)
                 pay_tp = to_int(rerec.PAY_TP)
-                print("new record", ozn)
-                if ozn == 1:
-                    find_df1_anddeleteifonlyone(rerec, session)
-                    print("deleted")
-                elif pay_tp==2 or pay_tp==3:
-                    print("incdec")
+                if pay_tp == 2:
+                    inc_or_create(rerec, session)
+                elif pay_tp == 3:
                     incdec_df1_record(rerec, session)
-                else:
+                elif ozn == 1:
+                    find_df1_anddeleteifonlyone(rerec, session)
+                elif ozn == 0:
                     add_df1(rerec, session)
-                    print("inserted")
+                else:
+                    raise Exception('indefinite operation')
         session.commit()
+    except MultipleResultsFound as e:
+        print(rerec.NUMIDENT, rerec.LN, str(file), str(e))
+        session.rollback()
+        return None
     except Exception as e:
-        print(str(e))
+        print(rerec.NUMIDENT, rerec.LN, str(file), str(e))
         session.rollback()
         return None
 
@@ -171,7 +100,3 @@ def apply_df1_adjustment(file: Path):
     #
     # if is_adjustment_for1person(adj):
     #     print(adj); exit()
-
-
-
-

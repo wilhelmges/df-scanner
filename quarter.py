@@ -1,6 +1,6 @@
 from pathlib import Path
 from core import dbf_report_params
-from grab import grab_df1, check_df1, apply_df1_adjustment, lookfor23
+from grab import grab_df1, apply_df1_adjustment, lookfor23
 from file_metadata import FileMetadataStore
 from repository import delete_from_df1
 
@@ -12,8 +12,6 @@ def iterate_quarter_folder(str_file_path):
     file_path = Path(str_file_path)
     for folder in file_path.iterdir():
         if folder.is_dir() and "кв" in folder.name.lower() and "202" in folder.name.lower():
-            #print('directory ', folder.name, folder)
-
             for file in folder.glob("*.dbf"):
                 #print(file.stem, dbf_report_params(file.stem))
                 if file.stem.lower().startswith("j"):
@@ -35,6 +33,8 @@ def iterate_quarter_folder(str_file_path):
 
                     #print("end of folder " + adjfolder.name + '~~~~~~~~~~')
             #print('----------- end of folder '+folder.name)
+        # else:
+        #     print('skip ', folder.name.lower())
     return operations, adjustments, toresearch
 
 if __name__=="__main__":
@@ -42,11 +42,20 @@ if __name__=="__main__":
     rez = iterate_quarter_folder(string_file_path)
     print(len(rez[0]), len(rez[1]))
 
-    #delete_from_df1()
+    print('main data')
+    delete_from_df1()
+    for file in rez[0]:
+        if dbf_report_params(file.stem)==1:
+            grab_df1(file)
+
+
+    print('apply adjustments')
     for file in rez[1]:
         if dbf_report_params(file.stem)==1:
             folder = str(file.parent)
-            apply_df1_adjustment(file); continue
+            #apply_df1_adjustment(file); continue
+            lookfor23(file); continue
+
             # store = FileMetadataStore(folder)
             # if store.is_initialized():
             #     print("Metadata вже існує")
