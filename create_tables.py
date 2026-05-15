@@ -7,7 +7,8 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
 from models.dbf110 import Df1
-
+from models.dbf510 import Df5
+from models.dbf410 import Df4
 
 Base.metadata.create_all(engine)
 session = SessionLocal()

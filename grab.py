@@ -5,6 +5,8 @@ from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.exc import MultipleResultsFound
 from sqlalchemy.orm import sessionmaker
 from models.dbf110 import Df1
+from models.dbf410 import Df4
+from models.dbf510 import Df5
 from db import Base, engine, SessionLocal
 from core import check_tax_code, to_int, short_dbf_path
 from core import dbf_report_params
@@ -14,9 +16,9 @@ from repository import finddf1, find_df1_anddeleteifonlyone, add_df1
 from repository import inc_or_create, dec_or_delete
 from types import SimpleNamespace
 
-
 from sanitizer import normalize_dbf_record
-
+from df4_sanitizer import parse_dbf4_row
+from df5_sanitizer import parse_dbf_record
 
 # C:\progs\df-scanner\samples\J0510409_4_2024.dbf  r"C:\progs\df-scanner\1 кв. 2023\Уточнення Гладишенко\J0510106_1_23_1.dbf"
 def grab_df1(file: Path):
@@ -33,6 +35,59 @@ def grab_df1(file: Path):
     except Exception as e:
         print(str(e), e)
         exit()
+
+def grab_df4(file: Path):
+    table = dbf.Table(str(file), codepage='cp1251')
+    table.open()
+    session = SessionLocal()
+    rerec = None
+    try:
+        for record in table:
+            rerec = parse_dbf4_row(record)
+            print(rerec.TIN, rerec.S_DOX)
+            session.add(Df4(
+                PERIOD=rerec.PERIOD,
+                TIN=rerec.TIN,
+                S_NAR=rerec.S_NAR,
+                S_DOX=rerec.S_DOX,
+                OZN_DOX=rerec.OZN_DOX,
+            ))
+
+    except Exception as e:
+        if rerec is not None:
+            print(rerec.TIN, str(file), str(e))
+        else:
+            print(str(file), str(e))
+
+    finally:
+        session.commit()
+        session.close()
+
+def grab_df5(file: Path):
+    table = dbf.Table(str(file), codepage='cp1251')
+    table.open()
+    session = SessionLocal()
+    try:
+        for record in table:
+            rerec = parse_dbf_record(record)
+            print(rerec.NUMIDENT, rerec.LN)
+            session.add(Df5(
+                PERIOD_M=rerec.PERIOD_M,
+                PERIOD_Y=rerec.PERIOD_Y,
+                NUMIDENT=rerec.NUMIDENT,
+                LN=rerec.LN,
+                NM=rerec.NM,
+                FTN=rerec.FTN,
+                START_DT=rerec.START_DT,
+                END_DT=rerec.END_DT,
+                PID=rerec.PID,
+                VZV=rerec.VZV,
+            ))
+    except Exception as e:
+        print(rerec.NUMIDENT, rerec.LN, str(file), str(e))
+    finally:
+        session.commit()
+        session.close()
 
 
 def lookfor23(file: Path):

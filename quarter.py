@@ -1,6 +1,6 @@
 from pathlib import Path
 from core import dbf_report_params
-from grab import grab_df1, apply_df1_adjustment, lookfor23
+from grab import grab_df1, apply_df1_adjustment, lookfor23,grab_df4, grab_df5
 from file_metadata import FileMetadataStore
 from repository import delete_from_df1
 
@@ -24,7 +24,7 @@ def iterate_quarter_folder(str_file_path):
                         #print(file.stem, dbf_report_params(file.stem))
                         df_num = dbf_report_params(file.stem)
 
-                        if df_num==1 or df_num==4 or df_num==5:
+                        if df_num==5: #df_num==1 or df_num==4 or :
                             #print("finded DF adjustment " +file.stem)
                             adjustments.append(file)
                         else:
@@ -43,12 +43,20 @@ if __name__=="__main__":
     print(len(rez[0]), len(rez[1]))
 
     print('main data')
-    delete_from_df1()
+    #delete_from_df1()
+
     for file in rez[0]:
-        if dbf_report_params(file.stem)==1:
-            grab_df1(file)
+        df = dbf_report_params(file.stem)
+        if df==1:
+            pass #grab_df1(file)
+        if df==4:
+            grab_df4(file)
+        if df==5:
+            pass #grab_df5(file)
 
 
+
+    exit()
     print('apply adjustments')
     for file in rez[1]:
         if dbf_report_params(file.stem)==1:
