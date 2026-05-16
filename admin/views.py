@@ -1,13 +1,13 @@
-from sqladmin import ModelView
+from sqladmin import ModelView, BaseView, expose
 
 from models.dbf110 import Df1
 from models.dbf410 import Df4
 from models.dbf510 import Df5
 
-
 class Df1Admin(ModelView, model=Df1):
     name = "Df1"
     name_plural = "Df1"
+    category = "Основні таблиці"
 
     column_list = [Df1.PAY_YEAR, Df1.PAY_MNTH, Df1.NUMIDENT, Df1.LN, Df1.NM, Df1.FTN,
                    Df1.SUM_TOTAL, Df1.SUM_MAX, Df1.SUM_NARAH
@@ -31,10 +31,10 @@ class Df1Admin(ModelView, model=Df1):
         Df1.LN,
     ]
 
-
 class Df4Admin(ModelView, model=Df4):
     name = "Df4"
     name_plural = "Df4"
+    category = "Основні таблиці"
 
     column_list = [
         Df4.id,
@@ -68,6 +68,7 @@ class Df4Admin(ModelView, model=Df4):
 class Df5Admin(ModelView, model=Df5):
     name = "Df5"
     name_plural = "Df5"
+    category = "Основні таблиці"
 
     # Відображення колонок у списку
     column_list = [
@@ -87,3 +88,4 @@ class Df5Admin(ModelView, model=Df5):
         Df5.NUMIDENT,
         Df5.LN,
     ]
+

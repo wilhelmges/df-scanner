@@ -103,7 +103,6 @@ def dec_or_delete(rerec: SimpleNamespace, session):
         raise Exception('maybe delete? ')
     obj.SUM_NARAH-=Decimal(str(rerec.SUM_NARAH))
 
-
 def incdec_df1_record(shape: SimpleNamespace, session):
     obj = session.execute(
         select(Df1).where(

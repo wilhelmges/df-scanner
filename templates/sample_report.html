@@ -1,0 +1,27 @@
+{% extends "sqladmin/layout.html" %}
+
+{% block content %}
+
+<h1>Аналітика</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Рік</th>
+            <th>Кількість</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for row in rows %}
+        <tr>
+            <td>{{ row.PAY_YEAR }}</td>
+            <td>{{ row.total }}</td>
+        </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+
+{% endblock %}

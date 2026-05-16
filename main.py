@@ -1,23 +1,24 @@
 from fastapi import FastAPI
-from sqladmin import Admin
-
-from db import engine, Base
-
-# імпорт моделей ОБОВ'ЯЗКОВИЙ
-from models.dbf110 import Df1
-from models.dbf410 import Df4
-from models.dbf510 import Df5
-
-from admin.views import Df1Admin, Df4Admin, Df5Admin
-
+from sqladmin import Admin, ModelView
+from db import engine
 
 app = FastAPI()
+admin = Admin(app, engine, templates_dir="templates")
 
-# створення таблиць Base.metadata.create_all(engine)
-# sqladmin
-admin = Admin(app, engine)
+from models.dbf110 import Df1
+from admin.views import Df1Admin
 
-# реєстрація admin view
+from sqladmin import BaseView, expose
+
+class ReportView(BaseView):
+    name = "Report Page"
+    icon = "fa-solid fa-chart-line"
+
+
+    @expose("/report", methods=["GET"])
+    async def report_page(self, request):
+        return await self.templates.TemplateResponse(request, "simplepage.html")
+
+admin.add_view(ReportView)
+
 admin.add_view(Df1Admin)
-admin.add_view(Df4Admin)
-admin.add_view(Df5Admin)
