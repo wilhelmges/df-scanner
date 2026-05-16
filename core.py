@@ -24,7 +24,9 @@ def to_int(value, default=-1):
     return int(float(s))
 
 def check_tax_code(code: str) -> bool:
-    if len(code) != 10 or not code.isdigit():
+    if not code.isdigit():
+        return True
+    if len(code) != 10:
         return False
 
     weights = [-1, 5, 7, 9, 4, 6, 10, 5, 7]
@@ -43,4 +45,4 @@ def check_tax_code(code: str) -> bool:
 
 
 if __name__ == '__main__':
-    print(dbf_report_params('J510510_24_9'))
+    print(check_tax_code('254181791'))
