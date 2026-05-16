@@ -17,7 +17,23 @@ class ReportView(BaseView):
 
     @expose("/report", methods=["GET"])
     async def report_page(self, request):
-        return await self.templates.TemplateResponse(request, "simplepage.html")
+        rows = [
+            {
+                "ipn": "1234567890",
+                "lastname": "Іваненко"
+            },
+            {
+                "ipn": "9876543210",
+                "lastname": "Петренко"
+            },
+            {
+                "ipn": "5555555555",
+                "lastname": "Шевченко"
+            }
+        ]
+        return await self.templates.TemplateResponse(request, "simplepage.html",{
+                "rows": rows
+            })
 
 admin.add_view(ReportView)
 

@@ -1,5 +1,26 @@
 {% extends "sqladmin/layout.html" %}
 
 {% block content %}
-<h1>TEST</h1>
+
+<div class="container mt-4">
+    <h1>Результат запиту</h1>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ІПН</th>
+                <th>Прізвище</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td>{{ row.ipn }}</td>
+                <td>{{ row.lastname }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 {% endblock %}
