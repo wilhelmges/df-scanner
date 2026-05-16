@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from sqladmin import Admin, ModelView
 from db import engine
+from sqlalchemy import text
+
 
 app = FastAPI()
 admin = Admin(app, engine, templates_dir="templates")
@@ -31,6 +33,18 @@ class ReportView(BaseView):
                 "lastname": "Шевченко"
             }
         ]
+
+        with engine.connect() as conn:
+            result = conn.execute(text("""
+                SELECT
+                    NUMIDENT as ipn,
+                    LN as lastname
+                FROM df1s
+                LIMIT 10
+            """))
+
+        rows = result.mappings().all()
+
         return await self.templates.TemplateResponse(request, "simplepage.html",{
                 "rows": rows
             })
