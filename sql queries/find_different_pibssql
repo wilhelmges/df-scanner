@@ -1,0 +1,13 @@
+SELECT DISTINCT
+    NUMIDENT AS ipn,
+    TRIM(LN || ' ' || NM || ' ' || FTN) AS pib
+FROM Df1s
+WHERE NUMIDENT IN (
+    SELECT NUMIDENT
+    FROM Df1s
+    GROUP BY NUMIDENT
+    HAVING COUNT(
+        DISTINCT TRIM(LN || ' ' || NM || ' ' || FTN)
+    ) > 1
+)
+ORDER BY NUMIDENT;

@@ -8,11 +8,23 @@ from decimal import Decimal
 
 from db import Base, engine, SessionLocal
 from models.dbf110 import Df1
+from models.dbf410 import Df4
+from models.dbf510 import Df5
 from types import SimpleNamespace
 
 def delete_from_df1():
     with SessionLocal() as session:
         session.execute(delete(Df1))
+        session.commit()
+
+def delete_from_df4():
+    with SessionLocal() as session:
+        session.execute(delete(Df4))
+        session.commit()
+
+def delete_from_df5():
+    with SessionLocal() as session:
+        session.execute(delete(Df5))
         session.commit()
 
 def finddf1(shape: SimpleNamespace):
@@ -115,6 +127,53 @@ def incdec_df1_record(shape: SimpleNamespace, session):
     ).scalar_one()
     sign = -1 if to_int(shape.PAY_TP) == 3 else 1 if to_int(shape.PAY_TP) == 2 else None
     obj.SUM_NARAH += Decimal(sign*shape.SUM_NARAH)
+
+def find_df4_anddeleteifonlyone(shape, session):
+    stmt = select(Df4).where(
+        Df4.TIN == shape.TIN,
+        Df4.RIK == shape.PERIOD_M,
+        Df4.PERIOD == shape.PERIOD_Y,
+        Df4.LN == shape.LN,
+    )
+    result = session.execute(stmt).scalar_one_or_none()
+    if result is not None:
+        session.delete(result)
+
+def add_df4(rerec, session):
+    session.add(Df5(
+        NP=rerec.NP,
+        PERIOD=rerec.PERIOD,
+        RIK=rerec.RIK,
+        TIN=rerec.TIN,
+        S_NARAH=rerec.SUM_NARAH,
+    ))
+
+
+def find_df5_anddeleteifonlyone(shape, session):
+    stmt = select(Df5).where(
+        Df5.NUMIDENT == shape.NUMIDENT,
+        Df5.PERIOD_M == shape.PERIOD_M,
+        Df5.PERIOD_Y == shape.PERIOD_Y,
+        Df5.LN == shape.LN,
+    )
+    result = session.execute(stmt).scalar_one_or_none()
+    if result is not None:
+        session.delete(result)
+
+def add_df5(rerec, session):
+    session.add(Df5(
+        PERIOD_M=rerec.PERIOD_M,
+        PERIOD_Y=rerec.PERIOD_Y,
+        NUMIDENT=str(rerec.NUMIDENT),
+        LN=rerec.LN,
+        NM=rerec.NM,
+        FTN=rerec.FTN,
+
+        START_DT=rerec.START_DT,
+        END_DT=rerec.END_DT,
+        PID=rerec.PID,
+        VZV=rerec.VZV,
+    ))
 
 if __name__ == "__main__":
     finddf1(SimpleNamespace(**{

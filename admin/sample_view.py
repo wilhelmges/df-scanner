@@ -10,8 +10,8 @@ class SampleReportView(BaseView):
     category = 'Перевірочні звіти'
 
     name = "Report Page"
-    @expose("/report", methods=["GET"])
-    async def report_page(self, request):
+    @expose("/testview", methods=["GET"])
+    async def testview_page(self, request):
         rows = [
             {
                 "ipn": "1234567890",

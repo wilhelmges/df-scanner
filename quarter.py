@@ -1,8 +1,9 @@
 from pathlib import Path
 from core import dbf_report_params
-from grab import grab_df1, apply_df1_adjustment, lookfor23,grab_df4, grab_df5
+from grab import grab_df1, apply_df1_adjustment, lookfor23, grab_df4, grab_df5, apply_df5_adjustment, \
+    apply_df4_adjustment
 from file_metadata import FileMetadataStore
-from repository import delete_from_df1
+from repository import delete_from_df1,  delete_from_df5
 
 def iterate_quarter_folder(str_file_path):
     operations = []
@@ -23,8 +24,9 @@ def iterate_quarter_folder(str_file_path):
                     for file in adjfolder.glob("*.dbf"):
                         #print(file.stem, dbf_report_params(file.stem))
                         df_num = dbf_report_params(file.stem)
-
-                        if df_num==5: #df_num==1 or df_num==4 or :
+                        if df_num==1 or df_num==5:
+                            pass
+                        elif df_num==4: #df_num==1 or df_num==4 or :
                             #print("finded DF adjustment " +file.stem)
                             adjustments.append(file)
                         else:
@@ -40,29 +42,25 @@ def iterate_quarter_folder(str_file_path):
 if __name__=="__main__":
     string_file_path = r"C:\progs\df-scanner\samples\medok" #r"s:\МЕДОК"  #
     rez = iterate_quarter_folder(string_file_path)
-    print(len(rez[0]), len(rez[1]))
 
+    print(len(rez[0]), len(rez[1]))
     print('main data')
-    #delete_from_df1()
 
     for file in rez[0]:
         df = dbf_report_params(file.stem)
         if df==1:
             pass #grab_df1(file)
         if df==4:
-            grab_df4(file)
+            pass #grab_df4(file)
         if df==5:
             pass #grab_df5(file)
 
-
-
-    exit()
     print('apply adjustments')
     for file in rez[1]:
-        if dbf_report_params(file.stem)==1:
-            folder = str(file.parent)
-            apply_df1_adjustment(file); continue
-            lookfor23(file); continue
+        df = dbf_report_params(file.stem)
+        if df==4:
+            apply_df4_adjustment(file); continue
+            lookfor23(file)
 
             # store = FileMetadataStore(folder)
             # if store.is_initialized():

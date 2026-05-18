@@ -25,6 +25,11 @@ class Df1Admin(ModelView, model=Df1):
         Df1.PAY_MNTH: Df1.PAY_MNTH.comment,
     }
 
+    column_default_sort = [
+        (Df1.PAY_YEAR, False),
+        (Df1.PAY_MNTH, False),
+    ]
+
     # Пошук
     column_searchable_list = [
         Df1.NUMIDENT,

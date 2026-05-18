@@ -290,7 +290,7 @@ def safe_ozn(value: Any) -> str:
 # Основна функція
 # ============================================================================
 
-def parse_dbf_record(record: Any) -> PersonRecord:
+def parse_dbf5_record(record: Any) -> PersonRecord:
     """
     Приймає:
         dbf.Record або dict-like object

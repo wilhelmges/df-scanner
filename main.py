@@ -11,9 +11,12 @@ from models.dbf110 import Df1
 from admin.views import Df1Admin
 
 from admin.notvalid_ipns import NotvalidIpns
+from admin.pib_withdifferent_ipns import PibWithDifferetIpns
 from admin.sample_view import SampleReportView
 
 admin.add_view(Df1Admin)
+
 admin.add_view(NotvalidIpns)
-admin.add_view(SampleReportView)
+admin.add_view(PibWithDifferetIpns)
+#admin.add_view(SampleReportView)
 

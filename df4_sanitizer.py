@@ -57,6 +57,9 @@ class DfRow:
     # Додаткова ознака
     OZNAKA: str
 
+    # Додаткова ознака
+    OZNAKA2: str
+
     # Поле A051
     A051: Decimal | None
 
@@ -64,21 +67,51 @@ class DfRow:
     A05: Decimal | None
 
 
+def get_field(record: Any, name: str) -> Any:
+    """
+    Безпечне отримання поля з DBF-запису.
+    """
+
+    if record is None:
+        return None
+
+    # dict-like
+    if isinstance(record, dict):
+        return record.get(name)
+
+    # object-like
+    try:
+        return getattr(record, name)
+    except Exception:
+        return None
+
 def safe_str(value: Any, lower: bool = True) -> str:
     """
     Безпечне перетворення в строку.
+
     - None -> ""
-    - прибирає пробіли
-    - optionally переводить у lower-case
+    - bytes -> decode cp1251
+    - trim
+    - remove null-bytes
+    - optionally lower-case
     """
 
     if value is None:
         return ""
 
-    result = str(value).strip()
+    if isinstance(value, (bytes, bytearray)):
+        try:
+            value = value.decode("cp1251", errors="ignore")
+        except Exception:
+            return ""
 
-    # прибираємо null-символи
+    result = str(value)
+
+    # remove null-bytes
     result = result.replace("\x00", "")
+
+    # trim
+    result = result.strip()
 
     if lower:
         result = result.lower()
@@ -87,51 +120,36 @@ def safe_str(value: Any, lower: bool = True) -> str:
 
 
 def safe_int(value: Any) -> int | None:
-    """
-    Безпечне перетворення в int.
-
-    Підтримує:
-    - int
-    - float
-    - bytes
-    - строки
-    - биті DBF значення
-    """
-
     if value is None:
         return None
 
-    # already int
     if isinstance(value, int):
         return value
 
-    # bytes from broken DBF fields
     if isinstance(value, (bytes, bytearray)):
+        # якщо поле повністю забите null-byte
+        if not value.replace(b"\x00", b""):
+            return None
+
         try:
             value = value.decode("cp1251", errors="ignore")
         except Exception:
             return None
 
-    text = str(value).strip()
+    text = str(value)
 
-    # empty
-    if not text:
-        return None
-
-    # DBF null garbage
-    text = text.replace("\x00", "").strip()
+    text = text.replace("\x00", "")
+    text = text.strip()
 
     if not text:
         return None
 
-    # normalize decimal separator
     text = text.replace(",", ".")
 
     try:
-        return int(float(text))
-    except (ValueError, TypeError):
+        return int(Decimal(text))
+    except Exception:
         return None
-
 
 def safe_decimal(value: Any) -> Decimal | None:
     """
@@ -149,16 +167,22 @@ def safe_decimal(value: Any) -> Decimal | None:
     if isinstance(value, Decimal):
         return value
 
-    text = str(value).strip()
+    if isinstance(value, (bytes, bytearray)):
+        try:
+            value = value.decode("cp1251", errors="ignore")
+        except Exception:
+            return None
+
+    text = str(value)
+
+    text = text.replace("\x00", "")
+    text = text.replace(" ", "")
+    text = text.replace("\xa0", "")
+    text = text.strip()
 
     if not text:
         return None
 
-    # прибираємо пробіли та non-breaking space
-    text = text.replace(" ", "")
-    text = text.replace("\xa0", "")
-
-    # заміна коми на крапку
     text = text.replace(",", ".")
 
     try:
@@ -175,10 +199,22 @@ def safe_date(value: Any) -> date | None:
     if value is None:
         return None
 
+    if isinstance(value, datetime):
+        return value.date()
+
     if isinstance(value, date):
         return value
 
-    text = str(value).strip()
+    if isinstance(value, (bytes, bytearray)):
+        try:
+            value = value.decode("cp1251", errors="ignore")
+        except Exception:
+            return None
+
+    text = str(value)
+
+    text = text.replace("\x00", "")
+    text = text.strip()
 
     if not text:
         return None
@@ -200,29 +236,35 @@ def safe_date(value: Any) -> date | None:
 
 def parse_dbf4_row(record: Any) -> DfRow:
     """
-    Безпечне зчитування одного рядка DBF в Python-об'єкт.
-
-    record:
-        Об'єкт рядка DBF.
-        Наприклад запис з dbfread або dbf.
+    Безпечне перетворення DBF-запису в DfRow.
     """
 
     return DfRow(
-        NP=safe_int(getattr(record, "NP", None)),
-        PERIOD=safe_int(getattr(record, "PERIOD", None)),
-        RIK=safe_int(getattr(record, "RIK", None)),
-        KOD=safe_str(getattr(record, "KOD", None)),
-        TYP=safe_int(getattr(record, "TYP", None)),
-        TIN=safe_str(getattr(record, "TIN", None)),
-        S_NAR=safe_decimal(getattr(record, "S_NAR", None)),
-        S_DOX=safe_decimal(getattr(record, "S_DOX", None)),
-        S_TAXN=safe_decimal(getattr(record, "S_TAXN", None)),
-        S_TAXP=safe_decimal(getattr(record, "S_TAXP", None)),
-        OZN_DOX=safe_int(getattr(record, "OZN_DOX", None)),
-        D_PRIYN=safe_date(getattr(record, "D_PRIYN", None)),
-        D_ZVILN=safe_date(getattr(record, "D_ZVILN", None)),
-        OZN_PILG=safe_int(getattr(record, "OZN_PILG", None)),
-        OZNAKA=safe_str(getattr(record, "OZNAKA", None)),
-        A051=safe_decimal(getattr(record, "A051", None)),
-        A05=safe_decimal(getattr(record, "A05", None)),
+        NP=safe_int(get_field(record, "NP")),
+        PERIOD=safe_int(get_field(record, "PERIOD")),
+        RIK=safe_int(get_field(record, "RIK")),
+
+        KOD=safe_str(get_field(record, "KOD"), lower=False),
+
+        TYP=safe_int(get_field(record, "TYP")),
+
+        TIN=safe_str(get_field(record, "TIN"), lower=False),
+
+        S_NAR=safe_decimal(get_field(record, "S_NAR")),
+        S_DOX=safe_decimal(get_field(record, "S_DOX")),
+        S_TAXN=safe_decimal(get_field(record, "S_TAXN")),
+        S_TAXP=safe_decimal(get_field(record, "S_TAXP")),
+
+        OZN_DOX=safe_int(get_field(record, "OZN_DOX")),
+
+        D_PRIYN=safe_date(get_field(record, "D_PRIYN")),
+        D_ZVILN=safe_date(get_field(record, "D_ZVILN")),
+
+        OZN_PILG=safe_int(get_field(record, "OZN_PILG")),
+
+        OZNAKA=safe_str(get_field(record, "OZNAKA"), lower=False),
+        OZNAKA2=safe_str(get_field(record, "OZNAKA2"), lower=False),
+
+        A051=safe_decimal(get_field(record, "A051")),
+        A05=safe_decimal(get_field(record, "A05")),
     )
