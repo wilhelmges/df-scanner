@@ -1,3 +1,4 @@
+
 from fastapi import FastAPI
 from sqladmin import Admin, ModelView
 from db import engine
@@ -6,30 +7,35 @@ from sqladmin import BaseView, expose
 from core import check_tax_code, parse_ipn
 
 
-class NotvalidIpns(BaseView):
+class IpnWithDiffPibs(BaseView):
     icon = "fa-solid fa-chart-line"
     category = 'Перевірочні звіти'
 
-    name = "Невалідні ІПН"
+    name = "ІПН з різними ПІБ"
 
-    @expose("/notipns", methods=["GET"])
-    async def report_page(self, request):
+    @expose("/diffpibs", methods=["GET"])
+    async def diffpibs_page(self, request):
         raw_conn = engine.raw_connection()
         cursor = None
         try:
-            raw_conn.create_function("check_tax_code", 1, check_tax_code)
             raw_conn.create_function("parse_ipn", 1, parse_ipn)
             cursor = raw_conn.cursor()
 
             result = raw_conn.execute("""
-                    SELECT DISTINCT
+                SELECT DISTINCT
         NUMIDENT AS ipn,
         TRIM(LN || ' ' || NM || ' ' || FTN) AS pib,
-        parse_ipn(NUMIDENT) as ipndata
-    FROM df1s
-    WHERE
-    NOT check_tax_code(NUMIDENT) AND
-    NUMIDENT IS NOT NULL
+         parse_ipn(NUMIDENT) AS ipndata
+    FROM Df1s
+    WHERE NUMIDENT IN (
+        SELECT NUMIDENT
+        FROM Df1s
+        GROUP BY NUMIDENT
+        HAVING COUNT(
+            DISTINCT TRIM(LN || ' ' || NM || ' ' || FTN)
+        ) > 1
+    )
+    ORDER BY NUMIDENT;
             """)
             #
 
