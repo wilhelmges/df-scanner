@@ -7,9 +7,15 @@ from sqladmin import BaseView, expose
 from models.dbf110 import Df1
 from models.dbf410 import Df4
 from models.dbf510 import Df5
+from admin.auth import AdminAuth
+from starlette.middleware.sessions import SessionMiddleware
+
 
 app = FastAPI()
-admin = Admin(app, engine, templates_dir="templates")
+authentication_backend = AdminAuth(
+    secret_key="FES_SECURITY_KEY"
+)
+admin = Admin(app, engine, templates_dir="templates", authentication_backend=authentication_backend,)
 
 from models.dbf110 import Df1
 from admin.views import Df1Admin, Df4Admin, Df5Admin

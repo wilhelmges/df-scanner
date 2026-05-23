@@ -2,3 +2,4 @@ sqlalchemy
 sqladmin
 fastapi
 uvicorn
+itsdangerous

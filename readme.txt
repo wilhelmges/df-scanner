@@ -1,1 +1,0 @@
-scan salary reports from triol
