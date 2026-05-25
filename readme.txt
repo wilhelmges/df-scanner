@@ -5,3 +5,5 @@
 
 запуск самого додатку з його папки
  uvicorn main:app --reload
+
+ quarter.py is an entry point to start parsing from dbf-files

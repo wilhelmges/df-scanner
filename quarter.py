@@ -25,10 +25,10 @@ def iterate_quarter_folder(str_file_path):
                         #print(file.stem, dbf_report_params(file.stem))
                         df_num = dbf_report_params(file.stem)
                         if df_num==1 or df_num==5:
-                            pass
+                            adjustments.append(file) #pass
                         elif df_num==4: #df_num==1 or df_num==4 or :
                             #print("finded DF adjustment " +file.stem)
-                            adjustments.append(file)
+                            pass#adjustments.append(file)
                         else:
                             #print("cant define ",file.stem)
                             toresearch.append(file)
@@ -43,23 +43,28 @@ if __name__=="__main__":
     string_file_path = r"C:\progs\df-scanner\samples\medok" #r"s:\МЕДОК"  #
     rez = iterate_quarter_folder(string_file_path)
 
-    print(len(rez[0]), len(rez[1]))
+    print(len(rez[0]), len(rez[1]),len(rez[2]))
     print('main data')
 
     for file in rez[0]:
         df = dbf_report_params(file.stem)
         if df==1:
-            pass #grab_df1(file)
+            delete_from_df1(); grab_df1(file)
         if df==4:
             pass #grab_df4(file)
         if df==5:
-            pass #grab_df5(file)
+            delete_from_df5(); grab_df5(file)
 
     print('apply adjustments')
     for file in rez[1]:
         df = dbf_report_params(file.stem)
+        if df==1:
+            apply_df1_adjustment(file); continue
         if df==4:
-            apply_df4_adjustment(file); continue
+            pass#apply_df4_adjustment(file); continue
+        if df == 5:
+            apply_df5_adjustment(file); continue
+            continue
             lookfor23(file)
 
             # store = FileMetadataStore(folder)
