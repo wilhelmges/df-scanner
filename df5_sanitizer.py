@@ -6,6 +6,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any, Optional
 import re
 
+from core import normalize_ukrainian_text
 
 # ============================================================================
 # Конфігурація полів
@@ -370,9 +371,9 @@ def parse_dbf5_record(record: Any) -> PersonRecord:
     # strings
     result.NUMIDENT = safe_numident(data.get("NUMIDENT"))
 
-    result.LN = safe_lower(data.get("LN"), max_len=100)
-    result.NM = safe_lower(data.get("NM"), max_len=100)
-    result.FTN = safe_lower(data.get("FTN"), max_len=100)
+    result.LN = normalize_ukrainian_text(safe_lower(data.get("LN"), max_len=100))
+    result.NM = normalize_ukrainian_text(safe_lower(data.get("NM"), max_len=100))
+    result.FTN = normalize_ukrainian_text(safe_lower(data.get("FTN"), max_len=100))
 
     result.PID_ZV = safe_lower(data.get("PID_ZV"), max_len=150)
 
@@ -398,7 +399,7 @@ if __name__ == "__main__":
         "PERIOD_Y": "2024",
         "UKR_GROMAD": "1",
         "NUMIDENT": " 3124017036 ",
-        "LN": " Іваненко\x00 ",
+        "LN": " Iваненко\x00 ",
         "NM": " Петро ",
         "FTN": " Іванович ",
         "START_DT": "20240501",
@@ -417,6 +418,6 @@ if __name__ == "__main__":
         "OZN": " ",
     }
 
-    rec = parse_dbf_record(fake_record)
+    rec = parse_dbf5_record(fake_record)
 
     print(rec)

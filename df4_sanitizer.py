@@ -5,7 +5,6 @@ from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
-
 @dataclass(slots=True)
 class DfRow:
     """
@@ -234,7 +233,7 @@ def safe_date(value: Any) -> date | None:
     return None
 
 
-def parse_dbf4_row(record: Any) -> DfRow:
+def parse_dbf4_record(record: Any) -> DfRow:
     """
     Безпечне перетворення DBF-запису в DfRow.
     """

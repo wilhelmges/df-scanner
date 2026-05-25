@@ -5,6 +5,8 @@ from types import SimpleNamespace
 from typing import Any
 import re
 
+from core import normalize_ukrainian_text
+
 
 # --- конфігурація полів ------------------------------------------------------
 
@@ -144,7 +146,7 @@ def _safe_float(value: Any) -> float | None:
 
 # --- головна функція ---------------------------------------------------------
 
-def normalize_dbf_record(
+def parse_dbf1_record(
     record,
     as_object: bool = False,
     keep_unknown_fields: bool = True,
@@ -217,7 +219,14 @@ def normalize_dbf_record(
 
         result[field] = value
 
+    result['LN'] = normalize_ukrainian_text(result['LN'])
+    result['NM'] = normalize_ukrainian_text(result['NM'])
+    result['FTN'] = normalize_ukrainian_text(result['FTN'])
+
     if as_object:
         return SimpleNamespace(**result)
 
     return result
+
+if __name__=="__main__":
+    pass

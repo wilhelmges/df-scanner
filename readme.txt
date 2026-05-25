@@ -1,0 +1,7 @@
+інсталяція пайтон-пакетів з консолі
+ pip install -r requirements.txt
+якщо не спрацювало, то 
+ python -m pip install -r requirements.txt
+
+запуск самого додатку з його папки
+ uvicorn main:app --reload

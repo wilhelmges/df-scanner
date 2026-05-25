@@ -1,5 +1,54 @@
 from pathlib import Path
 from datetime import date
+import re
+
+# Відповідність "схожих" латинських символів до українських
+LATIN_TO_UA = {
+    "A": "А",
+    "B": "В",
+    "C": "С",
+    "E": "Е",
+    "H": "Н",
+    "I": "І",
+    "K": "К",
+    "M": "М",
+    "O": "О",
+    "P": "Р",
+    "T": "Т",
+    "X": "Х",
+    "Y": "У",
+
+    "a": "а",
+    "c": "с",
+    "e": "е",
+    "i": "і",
+    "k": "к",
+    "m": "м",
+    "o": "о",
+    "p": "р",
+    "t": "т",
+    "x": "х",
+    "y": "у",
+}
+
+# Українські літери + пробіли + базові символи
+ALLOWED_PATTERN = re.compile(r"^[А-Яа-яІіЇїЄєҐґ0-9\s.,!?'\-:;()]+$")
+
+def normalize_ukrainian_text(text: str) -> str:
+    """
+    Замінює латинські літери, схожі на українські,
+    на відповідні українські символи.
+    """
+
+    result = []
+
+    for char in text:
+        result.append(LATIN_TO_UA.get(char, char))
+
+    normalized = "".join(result)
+
+    return normalized
+
 
 def parse_ipn(ipn: str) -> str:
     """
@@ -89,4 +138,7 @@ def check_tax_code(code: str) -> bool:
 
 
 if __name__ == '__main__':
-    print(parse_ipn("3175209377"))
+    text = "Привeт, як spravи? Mи з Києвa"
+    fixed = normalize_ukrainian_text(text)
+
+    print(fixed)

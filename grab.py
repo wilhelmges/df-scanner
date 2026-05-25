@@ -17,8 +17,8 @@ from repository import finddf1, find_df1_anddeleteifonlyone, add_df1, find_df5_a
 from repository import inc_or_create, dec_or_delete
 from types import SimpleNamespace
 
-from sanitizer import normalize_dbf_record
-from df4_sanitizer import parse_dbf4_row
+from df1_sanitizer import parse_dbf1_record
+from df4_sanitizer import parse_dbf4_record
 from df5_sanitizer import parse_dbf5_record
 
 # C:\progs\df-scanner\samples\J0510409_4_2024.dbf  r"C:\progs\df-scanner\1 кв. 2023\Уточнення Гладишенко\J0510106_1_23_1.dbf"
@@ -28,7 +28,7 @@ def grab_df1(file: Path):
     session = SessionLocal()
     try:
         for record in table:
-            rerec = normalize_dbf_record(record, as_object=True)
+            rerec = parse_dbf1_record(record, as_object=True)
             #print(rerec.LN, rerec.PAY_TP, rerec.OZN, rerec.SUM_NARAH)
             add_df1(rerec, session)
         session.commit()
@@ -44,7 +44,7 @@ def grab_df4(file: Path):
     rerec = None
     try:
         for record in table:
-            rerec = parse_dbf4_row(record)
+            rerec = parse_dbf4_record(record)
             print(rerec.TIN, rerec.S_DOX)
             session.add(Df4(
                 PERIOD=rerec.PERIOD,
@@ -122,7 +122,7 @@ def apply_df1_adjustment(file: Path):
     try:
         with SessionLocal() as session:
             for record in table:
-                rerec = normalize_dbf_record(record, as_object=True)
+                rerec = parse_dbf1_record(record, as_object=True)
                 ozn = to_int(rerec.OZN)
                 pay_tp = to_int(rerec.PAY_TP)
                 if pay_tp == 2:
@@ -157,7 +157,7 @@ def apply_df4_adjustment(file: Path):
     try:
         with SessionLocal() as session:
             for record in table:
-                rerec = parse_dbf4_row(record)
+                rerec = parse_dbf4_record(record)
                 ozn = to_int(rerec.OZNAKA)
                 ozn2 = to_int(rerec.OZNAKA2)
                 ozn = max(ozn, ozn2)
