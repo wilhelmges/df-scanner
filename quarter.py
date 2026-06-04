@@ -3,7 +3,7 @@ from core import dbf_report_params
 from grab import grab_df1, apply_df1_adjustment, lookfor23, grab_df4, grab_df5, apply_df5_adjustment, \
     apply_df4_adjustment
 from file_metadata import FileMetadataStore
-from repository import delete_from_df1,  delete_from_df5
+from repository import delete_from_df1, delete_from_df4, delete_from_df5
 
 def iterate_quarter_folder(str_file_path):
     operations = []
@@ -45,15 +45,16 @@ if __name__=="__main__":
 
     print(len(rez[0]), len(rez[1]),len(rez[2]))
     print('main data')
+    #delete_from_df1();delete_from_df5();
 
     for file in rez[0]:
         df = dbf_report_params(file.stem)
         if df==1:
-            delete_from_df1(); grab_df1(file)
+             pass #grab_df1(file)
         if df==4:
             pass #grab_df4(file)
         if df==5:
-            delete_from_df5(); grab_df5(file)
+             pass #grab_df5(file)
 
     print('apply adjustments')
     for file in rez[1]:

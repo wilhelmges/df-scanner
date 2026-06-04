@@ -42,11 +42,14 @@ class Df4Admin(ModelView, model=Df4):
     category = "Основні таблиці"
 
     column_list = [
-        Df4.id,
+        Df4.TIN,
         Df4.PERIOD,
         Df4.S_NAR,
-        Df4.S_DOX,
-        Df4.OZN_DOX,
+        Df4.id,
+    ]
+
+    column_searchable_list = [
+        Df4.TIN,
     ]
 
     column_labels = {

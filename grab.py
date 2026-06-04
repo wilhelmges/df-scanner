@@ -1,4 +1,6 @@
 from decimal import Decimal
+import traceback
+
 
 import dbf
 from sqlalchemy import create_engine, Column, Integer, String
@@ -35,6 +37,7 @@ def grab_df1(file: Path):
 
     except Exception as e:
         print(str(e), e)
+        print(traceback.format_exc())
         exit()
 
 def grab_df4(file: Path):

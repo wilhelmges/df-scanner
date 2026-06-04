@@ -39,6 +39,8 @@ def normalize_ukrainian_text(text: str) -> str:
     Замінює латинські літери, схожі на українські,
     на відповідні українські символи.
     """
+    if not text:
+        return ""
 
     result = []
 
@@ -139,6 +141,7 @@ def check_tax_code(code: str) -> bool:
 
 if __name__ == '__main__':
     text = "Привeт, як spravи? Mи з Києвa"
+    text = None
     fixed = normalize_ukrainian_text(text)
 
     print(fixed)
