@@ -43,6 +43,7 @@ class Df4Admin(ModelView, model=Df4):
 
     column_list = [
         Df4.TIN,
+        Df4.RIK,
         Df4.PERIOD,
         Df4.S_NAR,
         Df4.id,

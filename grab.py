@@ -1,7 +1,5 @@
 from decimal import Decimal
 import traceback
-
-
 import dbf
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.exc import MultipleResultsFound
@@ -48,16 +46,10 @@ def grab_df4(file: Path):
     try:
         for record in table:
             rerec = parse_dbf4_record(record)
-            print(rerec.TIN, rerec.S_DOX)
-            session.add(Df4(
-                PERIOD=rerec.PERIOD,
-                TIN=rerec.TIN,
-                S_NAR=rerec.S_NAR,
-                S_DOX=rerec.S_DOX,
-                OZN_DOX=rerec.OZN_DOX,
-            ))
+            add_df4(rerec, session)
 
     except Exception as e:
+        traceback.print_exc()
         if rerec is not None:
             print(rerec.TIN, str(file), str(e))
         else:
@@ -208,10 +200,12 @@ def apply_df5_adjustment(file: Path):
                     raise Exception('indefinite operation, ozn ', ozn)
         session.commit()
     except MultipleResultsFound as e:
+        traceback.print_exc()
         print(rerec.NUMIDENT, rerec.LN, str(file), str(e))
         session.rollback()
         return None
     except Exception as e:
+        traceback.print_exc()
         print(rerec.NUMIDENT, rerec.LN, str(file), str(e))
         # session.rollback()
         # return None

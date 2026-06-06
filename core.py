@@ -102,8 +102,7 @@ def dbf_report_params(filename):
         return int(sway)
     return 0 #'cant define for '+filename.split("_")[0]
 
-    # for part in sway[1:]:
-    #     if part.isdigit() and int(part) < 13:
+
 
 def to_int(value, default=-1):
     if value is None:

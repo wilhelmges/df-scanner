@@ -1,10 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "sqladmin/layout.html" %}
+
+{% block content %}
+
+<section class="container py-4" style="max-width: 960px;">
+    <header class="mb-4">
+        <h1 class="mb-2">Оновлення бази даних</h1>
+        <p class="text-muted mb-0">Перетягніть файл у потрібну область або виберіть його з комп'ютера.</p>
+    </header>
+
+    <form class="d-grid gap-4">
+        <section>
+            <h2 class="h4 mb-3">Файл 1</h2>
+            <label class="d-block border border-2 border-secondary-subtle rounded-3 bg-light p-5 text-center"
+                   style="min-height: 240px; cursor: pointer;">
+                <input class="d-none" type="file" name="file_1">
+                <span class="d-block fs-5 mb-2">Перетягніть файл сюди</span>
+                <span class="d-block text-muted mb-3">або</span>
+                <span class="btn btn-primary">Вибрати файл</span>
+            </label>
+        </section>
+
+        <section>
+            <h2 class="h4 mb-3">Файл 2</h2>
+            <label class="d-block border border-2 border-secondary-subtle rounded-3 bg-light p-5 text-center"
+                   style="min-height: 240px; cursor: pointer;">
+                <input class="d-none" type="file" name="file_2">
+                <span class="d-block fs-5 mb-2">Перетягніть файл сюди</span>
+                <span class="d-block text-muted mb-3">або</span>
+                <span class="btn btn-primary">Вибрати файл</span>
+            </label>
+        </section>
+    </form>
+</section>
+
+<script src="/static/getupdates.js">
+</script>
+
+{% endblock %}

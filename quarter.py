@@ -45,14 +45,15 @@ if __name__=="__main__":
 
     print(len(rez[0]), len(rez[1]),len(rez[2]))
     print('main data')
-    #delete_from_df1();delete_from_df5();
+    #delete_from_df1(); delete_from_df5();
+    delete_from_df4();
 
     for file in rez[0]:
         df = dbf_report_params(file.stem)
         if df==1:
              pass #grab_df1(file)
         if df==4:
-            pass #grab_df4(file)
+            grab_df4(file) #pass #
         if df==5:
              pass #grab_df5(file)
 
@@ -60,27 +61,11 @@ if __name__=="__main__":
     for file in rez[1]:
         df = dbf_report_params(file.stem)
         if df==1:
-            apply_df1_adjustment(file); continue
+            pass# apply_df1_adjustment(file); continue
         if df==4:
-            pass#apply_df4_adjustment(file); continue
+            apply_df4_adjustment(file); continue #pass#
         if df == 5:
-            apply_df5_adjustment(file); continue
+            pass#apply_df5_adjustment(file); continue
             continue
             lookfor23(file)
-
-            # store = FileMetadataStore(folder)
-            # if store.is_initialized():
-            #     print("Metadata вже існує")
-            # else:
-            #     print("Папка ще не ініціалізована")
-
-            print(file.name)
-            rez = apply_df1_adjustment(file)
-            print('file proced with rez ', rez)
-            if not rez:
-                print('failed')
-                # store.set_status(file.name,"failed"); store.update_file_info(file.name)
-            else:
-                print('42')
-                # store.set_status(file.name, "42"); store.update_file_info(file.name)
 

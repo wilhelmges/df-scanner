@@ -64,26 +64,6 @@ def find_df1_anddeleteifonlyone(shape: SimpleNamespace, session):
     else:
         session.delete(result)
 
-def add_df1(rerec: SimpleNamespace, session):
-    session.add(Df1(
-        PERIOD_M=rerec.PERIOD_M,
-        PERIOD_Y=rerec.PERIOD_Y,
-        NUMIDENT=str(rerec.NUMIDENT),
-        LN=rerec.LN,
-        NM=rerec.NM,
-        FTN=rerec.FTN,
-
-        PAY_TP=rerec.PAY_TP,
-        PAY_MNTH=rerec.PAY_MNTH,
-        PAY_YEAR=rerec.PAY_YEAR,
-
-        SUM_TOTAL=rerec.SUM_TOTAL,
-        SUM_MAX=rerec.SUM_MAX,
-        SUM_INS=rerec.SUM_INS,
-        SUM_NARAH=rerec.SUM_NARAH,
-        OZN=rerec.OZN
-    ))
-
 def inc_or_create(rerec: SimpleNamespace, session):
     stmt = select(Df1).where(
         Df1.NUMIDENT == rerec.NUMIDENT,
@@ -139,26 +119,35 @@ def find_df4_anddeleteifonlyone(shape, session):
     if result is not None:
         session.delete(result)
 
+def add_df1(rerec: SimpleNamespace, session):
+    session.add(Df1(
+        PERIOD_M=rerec.PERIOD_M,
+        PERIOD_Y=rerec.PERIOD_Y,
+        NUMIDENT=str(rerec.NUMIDENT),
+        LN=rerec.LN,
+        NM=rerec.NM,
+        FTN=rerec.FTN,
+
+        PAY_TP=rerec.PAY_TP,
+        PAY_MNTH=rerec.PAY_MNTH,
+        PAY_YEAR=rerec.PAY_YEAR,
+
+        SUM_TOTAL=rerec.SUM_TOTAL,
+        SUM_MAX=rerec.SUM_MAX,
+        SUM_INS=rerec.SUM_INS,
+        SUM_NARAH=rerec.SUM_NARAH,
+        OZN=rerec.OZN
+    ))
+
 def add_df4(rerec, session):
-    session.add(Df5(
+    session.add(Df4(
         NP=rerec.NP,
         PERIOD=rerec.PERIOD,
         RIK=rerec.RIK,
         TIN=rerec.TIN,
-        S_NARAH=rerec.SUM_NARAH,
+        S_NAR=rerec.S_NAR,
+        S_TAXN=rerec.S_TAXN,
     ))
-
-
-def find_df5_anddeleteifonlyone(shape, session):
-    stmt = select(Df5).where(
-        Df5.NUMIDENT == shape.NUMIDENT,
-        Df5.PERIOD_M == shape.PERIOD_M,
-        Df5.PERIOD_Y == shape.PERIOD_Y,
-        Df5.LN == shape.LN,
-    )
-    result = session.execute(stmt).scalar_one_or_none()
-    if result is not None:
-        session.delete(result)
 
 def add_df5(rerec, session):
     session.add(Df5(
@@ -174,6 +163,18 @@ def add_df5(rerec, session):
         PID=rerec.PID,
         VZV=rerec.VZV,
     ))
+
+def find_df5_anddeleteifonlyone(shape, session):
+    stmt = select(Df5).where(
+        Df5.NUMIDENT == shape.NUMIDENT,
+        Df5.PERIOD_M == shape.PERIOD_M,
+        Df5.PERIOD_Y == shape.PERIOD_Y,
+        Df5.LN == shape.LN,
+    )
+    result = session.execute(stmt).scalar_one_or_none()
+    if result is not None:
+        session.delete(result)
+
 
 if __name__ == "__main__":
     finddf1(SimpleNamespace(**{

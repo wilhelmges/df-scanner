@@ -6,7 +6,7 @@ from sqladmin import BaseView, expose
 from core import check_tax_code, parse_ipn
 
 
-class Process_updates(BaseView):
+class Get_updates(BaseView):
     icon = "fa-solid fa"
     category = 'Обслуговування БД'
 
