@@ -44,13 +44,3 @@ admin.add_view(PibWithDifferetIpns)
 admin.add_view(IpnWithDiffPibs)
 
 #admin.add_view(SampleReportView)
-
-class UploadMenu(BaseView):
-    name = "Імпорт файлів"
-    icon = "fa-solid fa-upload"
-
-    @expose("/")
-    async def index(self, request):
-        return RedirectResponse("/upload")
-
-admin.add_view(UploadMenu)

@@ -47,7 +47,7 @@ async def upload_page(request: Request):
         name="upload.html"
     )
 
-def process_file(job_id: str, file_path: Path):
+def process_file(job_id: str, file_path: Path, adjustment=True):
     """
     Імітація довгої обробки файлу.
     """
