@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Завантаження файлу</title>
+
+    <link rel="stylesheet" href="/static/upload.css">
+</head>
+<body>
+
+<h1>Завантаження файлу</h1>
+
+<form id="upload-form">
+    <input type="file" id="file" name="file" required>
+
+    <label for="filetype">Уточнення</label>
+    <input type="checkbox" checked id="filetype" name="filetype">
+    <button type="submit">Завантажити</button>
+</form>
+
+<hr>
+
+<div id="upload-status"></div>
+
+<progress
+    id="progress-bar"
+    value="0"
+    max="100"
+    style="width: 400px; display:none;"
+></progress>
+
+<script>
+
+const form = document.getElementById('upload-form');
+const statusDiv = document.getElementById('upload-status');
+const progressBar = document.getElementById('progress-bar');
+
+form.addEventListener('submit', async (event) => {
+
+    event.preventDefault();
+
+    const fileInput = document.getElementById('file');
+
+    if (!fileInput.files.length) {
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+    formData.append("filetype", document.getElementById("filetype").checked);
+
+    statusDiv.textContent = 'Завантаження файлу...';
+
+    try {
+
+        const uploadResponse = await fetch('/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!uploadResponse.ok) {
+            throw new Error('Помилка завантаження');
+        }
+
+        const uploadData = await uploadResponse.json();
+
+        const jobId = uploadData.job_id;
+
+        statusDiv.textContent = 'Файл завантажено. Починається обробка...';
+
+        progressBar.style.display = 'block';
+
+        const timer = setInterval(async () => {
+
+            const statusResponse = await fetch(`/status/${jobId}`);
+
+            if (!statusResponse.ok) {
+                clearInterval(timer);
+                statusDiv.textContent = 'Не вдалося отримати статус';
+                return;
+            }
+
+            const statusData = await statusResponse.json();
+
+            progressBar.value = statusData.progress || 0;
+
+            statusDiv.textContent =
+                `Статус: ${statusData.status}, ${statusData.progress}%`;
+
+            if (statusData.status === 'completed') {
+
+                clearInterval(timer);
+
+                progressBar.value = 100;
+
+                statusDiv.innerHTML =
+                    `✅ Обробку завершено (${statusData.progress}%)`;
+
+            }
+
+            if (statusData.status === 'failed') {
+
+                clearInterval(timer);
+
+                statusDiv.innerHTML =
+                    `❌ Помилка: ${statusData.error || 'невідома помилка'}`;
+
+            }
+
+        }, 2000);
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        statusDiv.innerHTML =
+            '❌ Помилка під час завантаження файлу';
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
