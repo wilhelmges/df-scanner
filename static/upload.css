@@ -15,3 +15,15 @@ button {
     padding: 10px 20px;
     cursor: pointer;
 }
+
+.checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+    accent-color: #2563eb;
+}

@@ -99,7 +99,7 @@ def process_file(job_id: str, file_path: Path, adjustment=True):
     """
     Імітація довгої обробки файлу.
     """
-
+    print('in processing ', adjustment)
     try:
         with jobs_lock:
             jobs[job_id]["status"] = "processing"
@@ -125,7 +125,7 @@ def process_file(job_id: str, file_path: Path, adjustment=True):
 async def upload_file(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    filetype: str = Form(...)
+    filetype: bool = Form(...)
 ):
     original_name = file.filename or "unknown"
     print('adjustment ',filetype)
@@ -171,7 +171,8 @@ async def upload_file(
         background_tasks.add_task(
             process_file,
             job_id,
-            file_path
+            file_path,
+            filetype
         )
 
         return {

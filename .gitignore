@@ -3,5 +3,5 @@
 __pycache__
 samples
 df.db
-upload_page/uploads/*
+uploads/*
 upload_page/__init__.py.ipynb
