@@ -11,9 +11,10 @@
 <h1>Завантаження файлу</h1>
 
 <form id="upload-form">
-    <input type="file" id="file" name="file" required>
+    <input type="file" id="file" name="file" accept=".dbf" required>
 
-    <label for="filetype">Уточнення
+    <label for="filetype">
+        Уточнення
         <input type="checkbox" checked id="filetype" name="filetype">
     </label>
 
@@ -31,6 +32,8 @@
         style="width: 400px; display:none;"
 ></progress>
 
+<a href="/admin">повернутись до перегляду звітів</a>
+
 <script>
 
     const form = document.getElementById('upload-form');
@@ -47,9 +50,30 @@
             return;
         }
 
+        const selectedFile = fileInput.files[0];
+
+        // Перевірка розширення на клієнті
+        if (!selectedFile.name.toLowerCase().endsWith('.dbf')) {
+
+            console.error(
+                'Недопустимий тип файлу:',
+                selectedFile.name
+            );
+
+            progressBar.style.display = 'none';
+
+            statusDiv.innerHTML =
+                '❌ Дозволені лише файли .dbf';
+
+            return;
+        }
+
         const formData = new FormData();
-        formData.append('file', fileInput.files[0]);
-        formData.append("filetype", document.getElementById("filetype").checked);
+        formData.append('file', selectedFile);
+        formData.append(
+            'filetype',
+            document.getElementById('filetype').checked
+        );
 
         statusDiv.textContent = 'Завантаження файлу...';
 
@@ -61,75 +85,158 @@
             });
 
             if (!uploadResponse.ok) {
-                throw new Error('Помилка завантаження');
+
+                let errorMessage =
+                    `Помилка завантаження (${uploadResponse.status})`;
+
+                try {
+
+                    const errorData =
+                        await uploadResponse.json();
+
+                    if (errorData.detail) {
+                        errorMessage = errorData.detail;
+                    }
+
+                } catch (e) {
+
+                    console.error(
+                        'Не вдалося прочитати відповідь сервера:',
+                        e
+                    );
+
+                }
+
+                console.error(
+                    'Upload failed:',
+                    uploadResponse.status,
+                    errorMessage
+                );
+
+                throw new Error(errorMessage);
             }
 
-            const uploadData = await uploadResponse.json();
+            const uploadData =
+                await uploadResponse.json();
 
-            if (uploadData.status === "already_processed") {
+            console.log(
+                'Upload response:',
+                uploadData
+            );
 
-        progressBar.style.display = "none";
+            if (uploadData.status === 'already_processed') {
 
-        statusDiv.innerHTML =
-            `ℹ️ Файл вже був оброблений раніше.<br>
-             Статус: ${uploadData.processing_status}`;
+                progressBar.style.display = 'none';
 
-        return;
-    }
+                statusDiv.innerHTML =
+                    `ℹ️ Файл вже був оброблений раніше.<br>
+                     Статус: ${uploadData.processing_status}`;
+
+                return;
+            }
 
             const jobId = uploadData.job_id;
 
-            statusDiv.textContent = 'Файл завантажено. Починається обробка...';
+            if (!jobId) {
 
+                console.error(
+                    'Відсутній job_id у відповіді:',
+                    uploadData
+                );
+
+                throw new Error(
+                    'Сервер не повернув ідентифікатор задачі'
+                );
+            }
+
+            statusDiv.textContent =
+                'Файл завантажено. Починається обробка...';
+
+            progressBar.value = 0;
             progressBar.style.display = 'block';
 
             const timer = setInterval(async () => {
 
-                const statusResponse = await fetch(`/status/${jobId}`);
+                try {
 
-                if (!statusResponse.ok) {
+                    const statusResponse =
+                        await fetch(`/status/${jobId}`);
+
+                    if (!statusResponse.ok) {
+
+                        console.error(
+                            'Status request failed:',
+                            statusResponse.status
+                        );
+
+                        clearInterval(timer);
+
+                        statusDiv.textContent =
+                            `Не вдалося отримати статус (${statusResponse.status})`;
+
+                        return;
+                    }
+
+                    const statusData =
+                        await statusResponse.json();
+
+                    console.log(
+                        'Status:',
+                        statusData
+                    );
+
+                    progressBar.value =
+                        statusData.progress || 0;
+
+                    statusDiv.textContent =
+                        `Статус: ${statusData.status}, ${statusData.progress || 0}%`;
+
+                    if (statusData.status === 'completed') {
+
+                        clearInterval(timer);
+
+                        progressBar.value = 100;
+
+                        statusDiv.innerHTML =
+                            `✅ Обробку завершено (100%)`;
+                    }
+
+                    if (statusData.status === 'failed') {
+
+                        clearInterval(timer);
+
+                        progressBar.style.display = 'none';
+
+                        statusDiv.innerHTML =
+                            `❌ Помилка: ${statusData.error || 'невідома помилка'}`;
+                    }
+
+                } catch (error) {
+
+                    console.error(
+                        'Помилка перевірки статусу:',
+                        error
+                    );
+
                     clearInterval(timer);
-                    statusDiv.textContent = 'Не вдалося отримати статус';
-                    return;
-                }
-
-                const statusData = await statusResponse.json();
-
-                progressBar.value = statusData.progress || 0;
-
-                statusDiv.textContent =
-                    `Статус: ${statusData.status}, ${statusData.progress}%`;
-
-                if (statusData.status === 'completed') {
-
-                    clearInterval(timer);
-
-                    progressBar.value = 100;
 
                     statusDiv.innerHTML =
-                        `✅ Обробку завершено (${statusData.progress}%)`;
-
-                }
-
-                if (statusData.status === 'failed') {
-
-                    clearInterval(timer);
-
-                    statusDiv.innerHTML =
-                        `❌ Помилка: ${statusData.error || 'невідома помилка'}`;
-
+                        '❌ Помилка отримання статусу';
                 }
 
             }, 2000);
 
-        }
-        catch (error) {
+        } catch (error) {
 
-            console.error(error);
+            console.error(
+                'Upload error:',
+                error
+            );
+
+            progressBar.style.display = 'none';
 
             statusDiv.innerHTML =
-                '❌ Помилка під час завантаження файлу';
-
+                `❌ ${error.message}`;
         }
 
     });
