@@ -4,242 +4,594 @@
     <meta charset="UTF-8">
     <title>Завантаження файлу</title>
 
-    <link rel="stylesheet" href="/static/upload.css">
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            font-family: "Segoe UI", Arial, sans-serif;
+
+            background: #f4f6f9;
+
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+
+            padding: 50px 20px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 650px;
+
+            background: white;
+
+            border-radius: 14px;
+
+            padding: 30px;
+
+            box-shadow:
+                0 4px 12px rgba(0,0,0,.05),
+                0 12px 30px rgba(0,0,0,.08);
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 25px;
+
+            color: #1f2937;
+            text-align: center;
+        }
+
+        .drop-zone {
+            border: 3px dashed #3b82f6;
+
+            border-radius: 12px;
+
+            padding: 40px 20px;
+
+            text-align: center;
+
+            cursor: pointer;
+
+            transition: .2s;
+
+            background: #f8fbff;
+        }
+
+        .drop-zone:hover {
+            background: #eef6ff;
+        }
+
+        .drop-zone.dragover {
+            background: #dbeafe;
+            border-color: #2563eb;
+            transform: scale(1.01);
+        }
+
+        .drop-icon {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .drop-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .drop-subtitle {
+            margin-top: 8px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        #file {
+            display: none;
+        }
+
+        .selected-file {
+            margin-top: 15px;
+
+            padding: 12px;
+
+            border-radius: 8px;
+
+            background: #f3f4f6;
+
+            color: #374151;
+
+            word-break: break-all;
+        }
+
+        .options {
+            margin-top: 20px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            font-size: 15px;
+            color: #374151;
+        }
+
+        .actions {
+            margin-top: 25px;
+        }
+
+        button {
+            width: 100%;
+
+            border: none;
+
+            background: #2563eb;
+
+            color: white;
+
+            padding: 14px;
+
+            border-radius: 8px;
+
+            font-size: 16px;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: .2s;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .progress-container {
+            display: none;
+            margin-top: 25px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 22px;
+
+            background: #e5e7eb;
+
+            border-radius: 999px;
+
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 0%;
+
+            height: 100%;
+
+            background: #22c55e;
+
+            transition: width .3s;
+        }
+
+        .progress-text {
+            margin-top: 8px;
+            text-align: center;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        #upload-status {
+            margin-top: 20px;
+
+            padding: 14px;
+
+            border-radius: 8px;
+
+            background: #f9fafb;
+
+            min-height: 50px;
+
+            line-height: 1.5;
+        }
+
+        .success {
+            color: #15803d;
+            font-weight: 600;
+        }
+
+        .error {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .info {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 25px;
+
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+    </style>
 </head>
 <body>
 
-<h1>Завантаження файлу</h1>
+<div class="card">
 
-<form id="upload-form">
-    <input type="file" id="file" name="file" accept=".dbf" required>
+    <h1>📄 Завантаження DBF файлу</h1>
 
-    <label for="filetype">
-        Уточнення
-        <input type="checkbox" checked id="filetype" name="filetype">
-    </label>
+    <form id="upload-form">
 
-    <button type="submit">Завантажити</button>
-</form>
+        <div class="drop-zone" id="drop-zone">
 
-<hr>
+            <div class="drop-icon">📂</div>
 
-<div id="upload-status"></div>
+            <div class="drop-title">
+                Перетягніть DBF файл сюди
+            </div>
 
-<progress
-        id="progress-bar"
-        value="0"
-        max="100"
-        style="width: 400px; display:none;"
-></progress>
+            <div class="drop-subtitle">
+                або натисніть для вибору файлу
+            </div>
 
-<a href="/admin">повернутись до перегляду звітів</a>
+            <input
+                type="file"
+                id="file"
+                name="file"
+                accept=".dbf"
+                required
+            >
+
+        </div>
+
+        <div
+            class="selected-file"
+            id="selected-file"
+        >
+            Файл не вибрано
+        </div>
+
+        <div class="options">
+
+            <label class="checkbox-label">
+
+                <input
+                    type="checkbox"
+                    checked
+                    id="filetype"
+                    name="filetype"
+                >
+
+                файл є уточненням
+
+            </label>
+
+        </div>
+
+        <div class="actions">
+
+            <button type="submit">
+                Завантажити
+            </button>
+
+        </div>
+
+    </form>
+
+    <div
+        class="progress-container"
+        id="progress-container"
+    >
+        <div class="progress-bar">
+            <div
+                class="progress-fill"
+                id="progress-fill"
+            ></div>
+        </div>
+
+        <div
+            class="progress-text"
+            id="progress-text"
+        >
+            0%
+        </div>
+    </div>
+
+    <div id="upload-status"></div>
+
+    <a
+        href="/admin"
+        class="back-link"
+    >
+        ← Повернутися до перегляду звітів
+    </a>
+
+</div>
 
 <script>
 
-    const form = document.getElementById('upload-form');
-    const statusDiv = document.getElementById('upload-status');
-    const progressBar = document.getElementById('progress-bar');
+    const form =
+        document.getElementById('upload-form');
 
-    form.addEventListener('submit', async (event) => {
+    const fileInput =
+        document.getElementById('file');
 
-        event.preventDefault();
+    const dropZone =
+        document.getElementById('drop-zone');
 
-        const fileInput = document.getElementById('file');
+    const selectedFile =
+        document.getElementById('selected-file');
+
+    const statusDiv =
+        document.getElementById('upload-status');
+
+    const progressContainer =
+        document.getElementById('progress-container');
+
+    const progressFill =
+        document.getElementById('progress-fill');
+
+    const progressText =
+        document.getElementById('progress-text');
+
+    dropZone.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', () => {
 
         if (!fileInput.files.length) {
             return;
         }
 
-        const selectedFile = fileInput.files[0];
+        selectedFile.textContent =
+            fileInput.files[0].name;
+    });
 
-        // Перевірка розширення на клієнті
-        if (!selectedFile.name.toLowerCase().endsWith('.dbf')) {
+    [
+        'dragenter',
+        'dragover'
+    ].forEach(eventName => {
 
-            console.error(
-                'Недопустимий тип файлу:',
-                selectedFile.name
-            );
+        dropZone.addEventListener(
+            eventName,
+            e => {
 
-            progressBar.style.display = 'none';
+                e.preventDefault();
 
-            statusDiv.innerHTML =
-                '❌ Дозволені лише файли .dbf';
-
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('file', selectedFile);
-        formData.append(
-            'filetype',
-            document.getElementById('filetype').checked
+                dropZone.classList.add(
+                    'dragover'
+                );
+            }
         );
 
-        statusDiv.textContent = 'Завантаження файлу...';
+    });
 
-        try {
+    [
+        'dragleave',
+        'drop'
+    ].forEach(eventName => {
 
-            const uploadResponse = await fetch('/upload', {
-                method: 'POST',
-                body: formData
-            });
+        dropZone.addEventListener(
+            eventName,
+            e => {
 
-            if (!uploadResponse.ok) {
+                e.preventDefault();
 
-                let errorMessage =
-                    `Помилка завантаження (${uploadResponse.status})`;
-
-                try {
-
-                    const errorData =
-                        await uploadResponse.json();
-
-                    if (errorData.detail) {
-                        errorMessage = errorData.detail;
-                    }
-
-                } catch (e) {
-
-                    console.error(
-                        'Не вдалося прочитати відповідь сервера:',
-                        e
-                    );
-
-                }
-
-                console.error(
-                    'Upload failed:',
-                    uploadResponse.status,
-                    errorMessage
+                dropZone.classList.remove(
+                    'dragover'
                 );
+            }
+        );
 
-                throw new Error(errorMessage);
+    });
+
+    dropZone.addEventListener(
+        'drop',
+        e => {
+
+            const files =
+                e.dataTransfer.files;
+
+            if (!files.length) {
+                return;
             }
 
-            const uploadData =
-                await uploadResponse.json();
+            fileInput.files = files;
 
-            console.log(
-                'Upload response:',
-                uploadData
-            );
+            selectedFile.textContent =
+                files[0].name;
+        }
+    );
 
-            if (uploadData.status === 'already_processed') {
+    form.addEventListener(
+        'submit',
+        async (event) => {
 
-                progressBar.style.display = 'none';
+            event.preventDefault();
+
+            if (!fileInput.files.length) {
+                return;
+            }
+
+            const file =
+                fileInput.files[0];
+
+            if (
+                !file.name
+                    .toLowerCase()
+                    .endsWith('.dbf')
+            ) {
 
                 statusDiv.innerHTML =
-                    `ℹ️ Файл вже був оброблений раніше.<br>
-                     Статус: ${uploadData.processing_status}`;
+                    '<span class="error">❌ Дозволені лише файли .dbf</span>';
 
                 return;
             }
 
-            const jobId = uploadData.job_id;
+            const formData =
+                new FormData();
 
-            if (!jobId) {
-
-                console.error(
-                    'Відсутній job_id у відповіді:',
-                    uploadData
-                );
-
-                throw new Error(
-                    'Сервер не повернув ідентифікатор задачі'
-                );
-            }
-
-            statusDiv.textContent =
-                'Файл завантажено. Починається обробка...';
-
-            progressBar.value = 0;
-            progressBar.style.display = 'block';
-
-            const timer = setInterval(async () => {
-
-                try {
-
-                    const statusResponse =
-                        await fetch(`/status/${jobId}`);
-
-                    if (!statusResponse.ok) {
-
-                        console.error(
-                            'Status request failed:',
-                            statusResponse.status
-                        );
-
-                        clearInterval(timer);
-
-                        statusDiv.textContent =
-                            `Не вдалося отримати статус (${statusResponse.status})`;
-
-                        return;
-                    }
-
-                    const statusData =
-                        await statusResponse.json();
-
-                    console.log(
-                        'Status:',
-                        statusData
-                    );
-
-                    progressBar.value =
-                        statusData.progress || 0;
-
-                    statusDiv.textContent =
-                        `Статус: ${statusData.status}, ${statusData.progress || 0}%`;
-
-                    if (statusData.status === 'completed') {
-
-                        clearInterval(timer);
-
-                        progressBar.value = 100;
-
-                        statusDiv.innerHTML =
-                            `✅ Обробку завершено (100%)`;
-                    }
-
-                    if (statusData.status === 'failed') {
-
-                        clearInterval(timer);
-
-                        progressBar.style.display = 'none';
-
-                        statusDiv.innerHTML =
-                            `❌ Помилка: ${statusData.error || 'невідома помилка'}`;
-                    }
-
-                } catch (error) {
-
-                    console.error(
-                        'Помилка перевірки статусу:',
-                        error
-                    );
-
-                    clearInterval(timer);
-
-                    statusDiv.innerHTML =
-                        '❌ Помилка отримання статусу';
-                }
-
-            }, 2000);
-
-        } catch (error) {
-
-            console.error(
-                'Upload error:',
-                error
+            formData.append(
+                'file',
+                file
             );
 
-            progressBar.style.display = 'none';
+            formData.append(
+                'filetype',
+                document.getElementById(
+                    'filetype'
+                ).checked
+            );
 
             statusDiv.innerHTML =
-                `❌ ${error.message}`;
-        }
+                '<span class="info">Завантаження файлу...</span>';
 
-    });
+            try {
+
+                const uploadResponse =
+                    await fetch(
+                        '/upload',
+                        {
+                            method: 'POST',
+                            body: formData
+                        }
+                    );
+
+                const uploadData =
+                    await uploadResponse.json();
+
+                if (!uploadResponse.ok) {
+                    throw new Error(
+                        uploadData.detail ||
+                        'Помилка завантаження'
+                    );
+                }
+
+                if (
+                    uploadData.status ===
+                    'already_processed'
+                ) {
+
+                    statusDiv.innerHTML =
+                        `<span class="info">
+                        ℹ️ Файл вже був оброблений раніше
+                        </span><br>
+                        Статус: ${uploadData.processing_status}`;
+
+                    return;
+                }
+
+                const jobId =
+                    uploadData.job_id;
+
+                progressContainer.style.display =
+                    'block';
+
+                const timer =
+                    setInterval(
+                        async () => {
+
+                            try {
+
+                                const response =
+                                    await fetch(
+                                        `/status/${jobId}`
+                                    );
+
+                                const data =
+                                    await response.json();
+
+                                const progress =
+                                    data.progress || 0;
+
+                                progressFill.style.width =
+                                    progress + '%';
+
+                                progressText.textContent =
+                                    progress + '%';
+
+                                statusDiv.innerHTML =
+                                    `<span class="info">
+                                    Статус: ${data.status}
+                                    </span>`;
+
+                                if (
+                                    data.status ===
+                                    'completed'
+                                ) {
+
+                                    clearInterval(
+                                        timer
+                                    );
+
+                                    progressFill.style.width =
+                                        '100%';
+
+                                    progressText.textContent =
+                                        '100%';
+
+                                    statusDiv.innerHTML =
+                                        '<span class="success">✅ Обробку завершено</span>';
+                                }
+
+                                if (
+                                    data.status ===
+                                    'failed'
+                                ) {
+
+                                    clearInterval(
+                                        timer
+                                    );
+
+                                    statusDiv.innerHTML =
+                                        `<span class="error">
+                                        ❌ ${data.error || 'Помилка'}
+                                        </span>`;
+                                }
+
+                            } catch (err) {
+
+                                clearInterval(
+                                    timer
+                                );
+
+                                statusDiv.innerHTML =
+                                    '<span class="error">❌ Помилка отримання статусу</span>';
+                            }
+
+                        },
+                        2000
+                    );
+
+            } catch (error) {
+
+                statusDiv.innerHTML =
+                    `<span class="error">
+                    ❌ ${error.message}
+                    </span>`;
+            }
+
+        }
+    );
 
 </script>
 
