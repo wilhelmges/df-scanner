@@ -126,6 +126,12 @@ async def upload_file(
     filetype: bool = Form(...)
 ):
     original_name = file.filename or "unknown"
+    if not original_name.lower().endswith(".dbf"):
+        raise HTTPException(
+            status_code=400,
+            detail="Дозволені лише файли .dbf"
+        )
+
     print('adjustment ',filetype)
 
     file_uuid = uuid.uuid4()
