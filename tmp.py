@@ -1,4 +1,5 @@
-from decimal import Decimal
+import sqladmin
+from pathlib import Path
 
-print(Decimal("1")*Decimal("2.001"))
+print(Path(sqladmin.__file__).parent / "templates")
 

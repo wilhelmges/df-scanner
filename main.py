@@ -44,6 +44,8 @@ from fastapi import (
 
 from fastapi.responses import HTMLResponse
 
+from imports_repository import file_processed
+
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")  # після app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -157,6 +159,7 @@ async def upload_file(
                 f.write(chunk)
 
         file_hash = sha256.hexdigest()
+        print('file processed? ', file_processed(file_hash))
 
         job_id = str(uuid.uuid4())
 
@@ -196,3 +199,4 @@ async def get_status(job_id: str):
         )
 
     return job
+

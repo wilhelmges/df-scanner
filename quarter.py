@@ -66,6 +66,5 @@ if __name__=="__main__":
             apply_df4_adjustment(file); continue #pass#
         if df == 5:
             pass#apply_df5_adjustment(file); continue
-            continue
-            lookfor23(file)
+
 

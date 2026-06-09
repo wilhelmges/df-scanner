@@ -220,3 +220,20 @@ def apply_df5_adjustment(file: Path):
     #
     # if is_adjustment_for1person(adj):
     #     print(adj); exit()
+
+def process_df(file: Path, adjustment:bool=True):
+    df = dbf_report_params(file.stem)
+    if not adjustment:
+        if df == 1:
+            grab_df1(file)
+        if df == 4:
+            grab_df4(file)  # pass #
+        if df == 5:
+            grab_df5(file)
+    else:
+        if df == 1:
+            apply_df1_adjustment(file)
+        if df == 4:
+            apply_df4_adjustment(file)
+        if df == 5:
+            apply_df5_adjustment(file)
