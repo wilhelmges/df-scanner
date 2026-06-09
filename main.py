@@ -43,8 +43,8 @@ from fastapi import (
 )
 
 from fastapi.responses import HTMLResponse
-
-from imports_repository import file_processed
+from imports_repository import file_processed, add_file
+from grab import process_df
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")  # після app = FastAPI()
@@ -97,7 +97,7 @@ async def upload_page(request: Request):
         name="upload.html"
     )
 
-def process_file(job_id: str, file_path: Path, adjustment=True):
+def process_file(job_id: str, file_path: Path,file_hash, adjustment=True):
     """
     Імітація довгої обробки файлу.
     """
@@ -107,12 +107,8 @@ def process_file(job_id: str, file_path: Path, adjustment=True):
             jobs[job_id]["status"] = "processing"
             jobs[job_id]["progress"] = 0
 
-        # Імітація 2 хвилин роботи
-        for step in range(12):
-            time.sleep(0.1)#10
-
-            with jobs_lock:
-                jobs[job_id]["progress"] = (step + 1) * 100 // 12
+        process_df(file_path, adjustment)
+        add_file(file_hash, str(file_path), "done")
 
         with jobs_lock:
             jobs[job_id]["status"] = "completed"
@@ -133,7 +129,7 @@ async def upload_file(
     print('adjustment ',filetype)
 
     file_uuid = uuid.uuid4()
-    stored_name = f"{file_uuid}_{original_name}"
+    stored_name = f"{original_name}"
 
     file_path = UPLOAD_DIR / stored_name
 
@@ -151,7 +147,7 @@ async def upload_file(
                     file_path.unlink(missing_ok=True)
 
                     raise HTTPException(
-                        status_code=413,
+                        status_code=409,
                         detail="Файл занадто великий"
                     )
 
@@ -159,22 +155,27 @@ async def upload_file(
                 f.write(chunk)
 
         file_hash = sha256.hexdigest()
-        print('file processed? ', file_processed(file_hash))
-
         job_id = str(uuid.uuid4())
+
+        if file_processed(file_hash):
+            return {
+                "status": "already_processed",
+                "message": "Файл вже був оброблений",
+                "processing_status": 'done'
+            }
 
         with jobs_lock:
             jobs[job_id] = {
                 "status": "queued",
                 "progress": 0,
-                "sha256": file_hash,
-                "file": stored_name,
+                "error": None
             }
 
         background_tasks.add_task(
             process_file,
             job_id,
             file_path,
+            file_hash,
             filetype
         )
 

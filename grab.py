@@ -223,6 +223,7 @@ def apply_df5_adjustment(file: Path):
 
 def process_df(file: Path, adjustment:bool=True):
     df = dbf_report_params(file.stem)
+    #print(str(file), file.stem, df, adjustment); return
     if not adjustment:
         if df == 1:
             grab_df1(file)
