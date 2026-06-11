@@ -1,29 +1,157 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
-    max-width: 600px;
-    margin: 50px auto;
-    padding: 20px;
+    margin: 0;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    display: flex;
+    justify-content: center;
+    background: #f4f6f9;
+    color: #1f2937;
+    font: 1rem/1.5 "Segoe UI", Arial, sans-serif;
+}
+
+.card {
+    width: min(100%, 40rem);
+    padding: 1.5rem;
+    background: #fff;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+}
+
+h1 {
+    margin: 0 0 1.5rem;
+    text-align: center;
 }
 
 form {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    display: grid;
+    gap: 1rem;
 }
 
-button {
-    align-self: start;
-    padding: 10px 20px;
+.drop-zone {
+    padding: 2rem 1rem;
+    text-align: center;
     cursor: pointer;
+    background: #f8fbff;
+    border: 2px dashed #3b82f6;
+    border-radius: 0.75rem;
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+    background: #eef6ff;
+}
+
+.drop-icon {
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+}
+
+.drop-title {
+    font-weight: 600;
+}
+
+.drop-subtitle {
+    margin-top: 0.5rem;
+    color: #6b7280;
+}
+
+#file {
+    display: none;
+}
+
+.selected-file,
+#upload-status {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    background: #f3f4f6;
 }
 
 .checkbox-label {
     display: inline-flex;
     align-items: center;
-    gap: 0.5em;
+    gap: 0.5rem;
     cursor: pointer;
-    user-select: none;
 }
 
 .checkbox-label input[type="checkbox"] {
     accent-color: #2563eb;
+}
+
+button {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: #2563eb;
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 600;
+}
+
+button:hover {
+    background: #1d4ed8;
+}
+
+button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.progress-container {
+    display: none;
+    margin-top: 1.5rem;
+}
+
+.progress-bar {
+    height: 1.25rem;
+    overflow: hidden;
+    background: #e5e7eb;
+    border-radius: 999px;
+}
+
+.progress-fill {
+    width: 0;
+    height: 100%;
+    background: #22c55e;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    margin-top: 0.5rem;
+    text-align: center;
+}
+
+#upload-status {
+    min-height: 3rem;
+    margin-top: 1.5rem;
+}
+
+.success {
+    color: #15803d;
+    font-weight: 600;
+}
+
+.error {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.info,
+.back-link {
+    color: #2563eb;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 1.5rem;
+    text-decoration: none;
+}
+
+.back-link:hover {
+    text-decoration: underline;
 }
