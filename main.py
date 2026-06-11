@@ -207,3 +207,6 @@ async def get_status(job_id: str):
 
     return job
 
+@app.get("/debug")
+def health_check():
+    return {"status": "ok"}
