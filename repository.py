@@ -1,16 +1,14 @@
-from sqlalchemy import create_engine, select, delete, String
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.exc import MultipleResultsFound
-from sqlalchemy.exc import SQLAlchemyError
-from core import to_int
 from decimal import Decimal
+from types import SimpleNamespace
 
+from sqlalchemy import delete, select
+from sqlalchemy.exc import MultipleResultsFound
 
-from db import Base, engine, SessionLocal
+from core import to_int
+from db import SessionLocal
 from models.dbf110 import Df1
 from models.dbf410 import Df4
 from models.dbf510 import Df5
-from types import SimpleNamespace
 
 def delete_from_df1():
     with SessionLocal() as session:

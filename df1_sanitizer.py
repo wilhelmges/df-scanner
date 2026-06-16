@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from decimal import Decimal
+import re
 from types import SimpleNamespace
 from typing import Any
-import re
 
 from core import normalize_ukrainian_text
 

@@ -1,8 +1,5 @@
-from sqlalchemy import text
-from starlette.responses import HTMLResponse
 from sqladmin import BaseView, expose
-
-from db import engine
+from starlette.responses import HTMLResponse
 
 class SampleReportView(BaseView):
     name = "sample report"

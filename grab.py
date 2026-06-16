@@ -1,25 +1,26 @@
-from decimal import Decimal
 import traceback
-import dbf
-from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.exc import MultipleResultsFound
-from sqlalchemy.orm import sessionmaker
-from models.dbf110 import Df1
-from models.dbf410 import Df4
-from models.dbf510 import Df5
-from db import Base, engine, SessionLocal
-from core import check_tax_code, to_int, short_dbf_path
-from core import dbf_report_params
-from pathlib import Path
 from collections import defaultdict
-from repository import finddf1, find_df1_anddeleteifonlyone, add_df1, find_df5_anddeleteifonlyone, add_df5, \
-    find_df4_anddeleteifonlyone, add_df4
-from repository import inc_or_create, dec_or_delete
-from types import SimpleNamespace
+from decimal import Decimal
+from pathlib import Path
 
+import dbf
+from sqlalchemy.exc import MultipleResultsFound
 from df1_sanitizer import parse_dbf1_record
 from df4_sanitizer import parse_dbf4_record
 from df5_sanitizer import parse_dbf5_record
+from core import dbf_report_params, short_dbf_path, to_int
+from db import SessionLocal
+from models.dbf510 import Df5
+from repository import (
+    add_df1,
+    add_df4,
+    add_df5,
+    dec_or_delete,
+    find_df1_anddeleteifonlyone,
+    find_df4_anddeleteifonlyone,
+    find_df5_anddeleteifonlyone,
+    inc_or_create,
+)
 
 # C:\progs\df-scanner\samples\J0510409_4_2024.dbf  r"C:\progs\df-scanner\1 кв. 2023\Уточнення Гладишенко\J0510106_1_23_1.dbf"
 def grab_df1(file: Path):

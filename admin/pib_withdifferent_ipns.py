@@ -1,10 +1,7 @@
-
-from fastapi import FastAPI
-from sqladmin import Admin, ModelView
-from db import engine
-from sqlalchemy import text
 from sqladmin import BaseView, expose
+
 from core import check_tax_code, parse_ipn
+from db import engine
 
 
 class PibWithDifferetIpns(BaseView):

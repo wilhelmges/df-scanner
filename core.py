@@ -1,5 +1,5 @@
-from pathlib import Path
 from datetime import date
+from pathlib import Path
 import re
 
 # Відповідність "схожих" латинських символів до українських

@@ -1,7 +1,8 @@
+import os
+
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-import os
 
 # Визначаємо шлях до локальних шаблонів модуля
 current_dir = os.path.dirname(os.path.abspath(__file__))

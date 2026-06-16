@@ -1,11 +1,5 @@
-from fastapi import FastAPI, Request
-from starlette.responses import RedirectResponse
-
-from sqladmin import Admin
+from fastapi import Request
 from sqladmin.authentication import AuthenticationBackend
-
-
-from db import engine
 
 class AdminAuth(AuthenticationBackend):
     def __init__(self, secret_key: str):

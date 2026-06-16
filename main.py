@@ -1,50 +1,35 @@
-from fastapi import FastAPI
-from fastapi.templating import Jinja2Templates
-from fastapi import Request
-from fastapi.responses import RedirectResponse
-
-from sqladmin import Admin, ModelView
-from db import engine
-from sqlalchemy import text
-from sqladmin import BaseView, expose
-# імпорт моделей ОБОВ'ЯЗКОВИЙ
-from models.dbf110 import Df1
-from models.dbf410 import Df4
-from models.dbf510 import Df5
-from admin.auth import AdminAuth
-from starlette.middleware.sessions import SessionMiddleware
-
-from admin.views import Df1Admin, Df4Admin, Df5Admin
-
-from admin.notvalid_ipns import NotvalidIpns
-from admin.pib_withdifferent_ipns import PibWithDifferetIpns
-from admin.ipn_withdiffpibs import IpnWithDiffPibs
-from admin.getupdates import Get_updates
-from admin.sample_view import SampleReportView
-
-from fastapi.staticfiles import StaticFiles 
-from sqladmin import BaseView, expose
-from fastapi.responses import RedirectResponse
-
-from pathlib import Path
 import hashlib
 import uuid
-import time
+from pathlib import Path
 from threading import Lock
 
 from fastapi import (
+    BackgroundTasks,
     FastAPI,
     File,
-    UploadFile,
+    Form,
     HTTPException,
-    BackgroundTasks,
     Request,
-    Form
+    UploadFile,
 )
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from sqladmin import Admin
 
-from fastapi.responses import HTMLResponse
-from imports_repository import file_processed, add_file
+from admin.auth import AdminAuth
+from admin.ipn_withdiffpibs import IpnWithDiffPibs
+from admin.notvalid_ipns import NotvalidIpns
+from admin.pib_withdifferent_ipns import PibWithDifferetIpns
+from admin.views import Df1Admin, Df4Admin, Df5Admin
+from db import engine
 from grab import process_df
+from imports_repository import add_file, file_processed
+
+# Import models before admin setup.
+from models.dbf110 import Df1
+from models.dbf410 import Df4
+from models.dbf510 import Df5
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")  # після app = FastAPI()

@@ -7,3 +7,6 @@
  uvicorn main:app --reload
 
  quarter.py is an entry point to start parsing from dbf-files
+
+ запуск тестів для додатку
+ python -m pytest tests/test_routes.py -v

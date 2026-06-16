@@ -1,9 +1,7 @@
-from fastapi import FastAPI
-from sqladmin import Admin, ModelView
-from db import engine
 from sqlalchemy import text
 from sqladmin import BaseView, expose
 
+from db import engine
 
 class SampleReportView(BaseView):
     icon = "fa-solid fa-chart-line"

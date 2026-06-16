@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Numeric
+from sqlalchemy import Column, String
+
 from db import Base
 
 class Adjfile(Base):
