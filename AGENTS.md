@@ -24,6 +24,7 @@ Do not read or analyze:
 - .idea/
 - .git/
 - venv/
+- specs/
 - __pycache__/
 - .pytest_cache/
 - df.db

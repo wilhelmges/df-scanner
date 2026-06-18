@@ -6,7 +6,6 @@ client = TestClient(app)
 def test_pages_alive():
     routes = [
         "/",
-        "/admin",
         "/getupdates",
     ]
 
@@ -31,3 +30,11 @@ def test_getupdates_page2():
 def test_unknown_page():
     response = client.get("/this-page-does-not-exist")
     assert response.status_code == 404
+
+def test_admin_redirects_to_login():
+    response = client.get(
+        "/admin/",
+        follow_redirects=False
+    )
+    assert response.status_code == 302
+    assert "/admin/login" in response.headers["location"]
