@@ -10,8 +10,12 @@ class Df1Admin(ModelView, model=Df1):
     category = "Основні таблиці"
 
     column_list = [Df1.PAY_YEAR, Df1.PAY_MNTH, Df1.NUMIDENT, Df1.LN, Df1.NM, Df1.FTN,
-                   Df1.SUM_TOTAL, Df1.SUM_MAX, Df1.SUM_NARAH
-        , Df1.id]
+                   Df1.PAY_TP,
+                   "sum_total_display",
+                   "sum_max_display",
+                   "sum_narah_display",
+        Df1.id
+    ]
 
     column_labels = {
         Df1.NUMIDENT: Df1.NUMIDENT.comment,
@@ -23,6 +27,9 @@ class Df1Admin(ModelView, model=Df1):
         Df1.SUM_NARAH: Df1.SUM_NARAH.comment,
         Df1.PAY_YEAR: Df1.PAY_YEAR.comment,
         Df1.PAY_MNTH: Df1.PAY_MNTH.comment,
+        "sum_total_display": Df1.SUM_TOTAL.comment,
+        "sum_max_display": Df1.SUM_MAX.comment,
+        "sum_narah_display": Df1.SUM_NARAH.comment,
     }
 
     column_default_sort = [
@@ -36,6 +43,12 @@ class Df1Admin(ModelView, model=Df1):
         Df1.LN,
     ]
 
+    column_sortable_list = [
+        Df1.LN,
+    ]
+
+
+
 class Df4Admin(ModelView, model=Df4):
     name = "Df4"
     name_plural = "Df4"
@@ -46,6 +59,7 @@ class Df4Admin(ModelView, model=Df4):
         Df4.RIK,
         Df4.PERIOD,
         Df4.S_NAR,
+
         Df4.id,
     ]
 

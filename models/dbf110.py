@@ -126,3 +126,28 @@ class Df1(Base):
     _ERROR = Column(String(2000), comment="Помилка у вхідних данних", info={
         "dbf_type": "C"
     })
+
+    @property
+    def sum_total_display(self):
+
+        if str(self.PAY_TP) == "3":
+            return -self.SUM_TOTAL
+
+        return self.SUM_TOTAL
+
+    @property
+    def sum_max_display(self):
+
+        if str(self.PAY_TP) == "3":
+            return -self.SUM_MAX
+
+        return self.SUM_MAX
+
+    @property
+    def sum_narah_display(self):
+
+        if str(self.PAY_TP) == "3":
+            return -self.SUM_NARAH
+
+        return self.SUM_NARAH
+
