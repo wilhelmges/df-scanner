@@ -10,8 +10,10 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
 
-Base.metadata.create_all(engine)
-session = SessionLocal()
+for name in Base.metadata.tables:
+    print(name)
 
-session.add(User(name="Test"))
-session.commit()
+# Base.metadata.create_all(engine)
+# session = SessionLocal()
+# session.add(User(name="Test"))
+# session.commit()

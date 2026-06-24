@@ -51,7 +51,6 @@ def normalize_ukrainian_text(text: str) -> str:
 
     return normalized
 
-
 def parse_ipn(ipn: str) -> str:
     """
     Повертає строку:
@@ -101,8 +100,6 @@ def dbf_report_params(filename):
     if sway.isdigit():
         return int(sway)
     return 0 #'cant define for '+filename.split("_")[0]
-
-
 
 def to_int(value, default=-1):
     if value is None:
