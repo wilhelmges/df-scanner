@@ -6,7 +6,6 @@ from models.dbf510 import Df5
 
 class Df1Admin(ModelView, model=Df1):
     name = "Df1"
-    name_plural = "Df1"
     category = "Основні таблиці"
 
     column_list = [Df1.PAY_YEAR, Df1.PAY_MNTH, Df1.NUMIDENT, Df1.LN, Df1.NM, Df1.FTN,
