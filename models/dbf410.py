@@ -38,21 +38,18 @@ class Df4(Base):
     NP: Mapped[int | None] = mapped_column(
         Integer,
         nullable=True,
-        index=True,
         comment="Порядковий номер запису"
     )
 
     PERIOD: Mapped[int | None] = mapped_column(
         Integer,
         nullable=True,
-        index=True,
         comment="Місяць звітного періоду"
     )
 
     RIK: Mapped[int | None] = mapped_column(
         Integer,
         nullable=True,
-        index=True,
         comment="Рік звітного періоду"
     )
 
@@ -60,14 +57,12 @@ class Df4(Base):
         String(10),
         nullable=False,
         default="",
-        index=True,
         comment="Код або службовий ідентифікатор запису"
     )
 
     TYP: Mapped[int | None] = mapped_column(
         Integer,
         nullable=True,
-        index=True,
         comment="Тип запису"
     )
 
@@ -75,7 +70,6 @@ class Df4(Base):
         String(10),
         nullable=False,
         default="",
-        index=True,
         comment="РНОКПП / ІПН фізичної особи"
     )
 
@@ -110,28 +104,24 @@ class Df4(Base):
     OZN_DOX: Mapped[int | None] = mapped_column(
         Integer,
         nullable=True,
-        index=True,
         comment="Ознака доходу"
     )
 
     D_PRIYN: Mapped[date | None] = mapped_column(
         Date,
         nullable=True,
-        index=True,
         comment="Дата прийняття працівника"
     )
 
     D_ZVILN: Mapped[date | None] = mapped_column(
         Date,
         nullable=True,
-        index=True,
         comment="Дата звільнення працівника"
     )
 
     OZN_PILG: Mapped[int | None] = mapped_column(
         Integer,
         nullable=True,
-        index=True,
         comment="Ознака податкової пільги"
     )
 
@@ -139,7 +129,6 @@ class Df4(Base):
         String(1),
         nullable=False,
         default="",
-        index=True,
         comment="Додаткова службова ознака"
     )
 

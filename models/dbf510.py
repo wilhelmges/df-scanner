@@ -43,8 +43,6 @@ class Df5(Base):
 
     NUMIDENT: Mapped[str | None] = mapped_column(
         String(10),
-        index=True,
-        nullable=True,
         comment="Ідентифікаційний номер особи"
     )
 
